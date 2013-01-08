@@ -1,0 +1,43 @@
+--------------------------
+Painter vs Photographer
+--------------------------
+  Painter:
+    * 2D
+    * Canvas, brush, color
+
+  Photographer:
+    * 3D
+    * objects, lights, cameras
+
+Painters work in layers (background to foreground)
+
+
+--------------------------
+Open GL API
+--------------------------
+
+  More like a photographer
+
+  Create 3D objects & specify properties (color, material, light sources, zoom, angle)
+
+
+--------------------------
+Building blocks of graphical objects
+--------------------------
+
+  Points (Vertices)
+  
+  Lines
+
+  Planes (Triangles or Quads)
+
+  Triangles are easier to work with because all points MUST lie on same plane
+
+  Check for coplaner when building quads
+    * 2 of 4 lines are parallel
+
+  Utah Teapot Example:
+    Triangles are used in cover, can't cover over with quads. Think of umbrellas 
+
+    Face orientation determines shading
+
