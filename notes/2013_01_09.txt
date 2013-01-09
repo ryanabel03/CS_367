@@ -1,0 +1,80 @@
+----------------------
+Graphics pipeline
+----------------------
+  1. Specify Vertices
+
+  2. Primitive assembly
+    * Take vertices and make them part of one object (making triangles)
+
+  3. Rasterization
+    * Identify all pixels that will be part of the primitive shape
+
+  4. Fragment operations
+    * A fragment is each pixel that will potential appear in the image
+    * Shading
+ 
+ Culling: Excluding vertices that are not visible in the camera
+
+
+----------------------
+OpenGL primitives
+----------------------
+
+  Example:
+    Points
+      glbegin(gl_points)
+        glcolor3f(1, 0, 0); //Red
+        glvertex2f(0, 0); //Point 1
+        glvertex2f(1, 0); //Point 2
+      glend();
+
+    Lines
+      glbegin(gl_lines)
+        glcolor3f(1, 0, 0); //Red
+        glvertex2f(0, 0); //Line 1
+        glvertex2f(1, 0); //Line 1
+      glend();
+
+
+    Triangles
+      * see ppt slide 16
+
+    Triangle-Fan
+      * see ppt slide 17
+      * like an umbrella
+
+
+----------------------
+Vertex arrays
+----------------------
+
+  Without vertex arrays we would need to make a call for each vertex
+
+  With vertex arrays we can keep points in an array and call once for array
+
+
+
+----------------------
+Photographer Paradigm
+----------------------
+
+  Select a Camera
+    * Resolution
+    * Lens
+    * Projection Matrix
+
+  Arrange Objects
+    * Model view matrix
+    
+
+----------------------
+Transformation Matricies
+----------------------
+  
+  Homogeneous coordinates
+    * Must add extra coordinate when promoted to homogeneous
+    * New coordinate is scaling factor
+    * 4x4 Matricies
+
+  Linear Matricies
+    * 3x3 Matricies in cartesian coordinate frames
