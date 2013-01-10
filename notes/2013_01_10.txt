@@ -1,0 +1,75 @@
+--------------------
+Points vs Vectors
+--------------------
+
+  Point
+    * geometric object that describes a location
+
+  Vector
+    * geometric object that describes motion (direction) of two points
+    * Not attached to any location -- vectors are translation-invariant 
+
+  Space: An infinite set of something
+
+
+--------------------
+Vector space
+--------------------
+
+  An inifinte set of vectors with two operations 
+    * Addition of two vectors
+    * Scalar multiplication of vectors
+
+  Distributive Property
+    * a(u + v) = au + av
+     -- where a is a scalar and u and v are vectors
+
+
+--------------------
+Affine space
+--------------------
+
+  A vector space with an infinite set of points and a subtraction operation
+
+  Subtraction
+    * Subtract two points, result is a vector
+    * B - A = u   OR    head - tail = u
+      -- where B and A are points and u is a vector
+    
+  Adding a vector to a point
+    * Get another point
+
+
+--------------------
+Euclidean space
+--------------------
+
+  A vector space with an inner product of two vectors (DOT PRODUCT)
+
+  Inner product
+    * product of two vectors, result is a scalar
+    * < a, b >
+      -- where a and b are vectors
+    * Allows measurement of distance and angle
+
+  Derived operations
+    * Length of a vector
+      -- |a| = sqrt(<a, a>)
+
+    * Distance between two points
+      -- x = P - Q    OR    x = Q - P
+      -- where P and Q are points and x is a vector
+      -- distance(P, Q) = |x|
+    
+    * Angle between 2 vectors
+      -- /_ (a, b) = arc cos ( <a, b> / (|a| |b|) )
+
+
+
+
+
+
+
+
+
+
