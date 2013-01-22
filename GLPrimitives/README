@@ -1,0 +1,21 @@
+Tools needed to compile:
+
+1) cmake
+2) GLUT header files
+3) C++ compiler: g++ or Visual C++ Express
+
+On Linux, use the freeglut3-dev package.
+On Windows, follow the instruction found at one of the following sites:
+     http://user.xmission.com/\~nate/glut.html
+     http://www.opengl.org/resources/libraries/glut/
+
+Steps to compile:
+(1) mkdir build
+(2) cd build
+(3) cmake ../src
+(4a) make     # on Linux/Mac
+(4b) nmake    # on Windows
+
+A binary executable gp[.exe] should be found under the "build" directory
+
+
