@@ -12,7 +12,6 @@
 using namespace std;
 
 class GLPanel: public QGLWidget {
-
     Q_OBJECT
     public:
         GLPanel (QWidget *parent, const char *name);

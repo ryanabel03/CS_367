@@ -30,6 +30,7 @@ GUI::GUI (QWidget * parent, const char *name, WFlags f)
    connect (run, SIGNAL (clicked ()), glarea, SLOT (updateGL ()));
    connect (stepMode, SIGNAL (clicked (int)), glarea,
       SLOT (setStepMode (int)));
+
    connect (hScroll, SIGNAL (valueChanged (int)), glarea,
       SLOT (setFocusX (int)));
    connect (vScroll, SIGNAL (valueChanged (int)), glarea,
