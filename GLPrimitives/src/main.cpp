@@ -2,9 +2,10 @@
  * main.cpp
  *
  *  Created on: 2013-01-21
- *      Author: dulimarh
+ *      Author: Hans Dulimarta <dulimarh@cis.gvsu.edu>
  */
 
+#include <cstdlib>
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
@@ -20,15 +21,15 @@ using namespace std;
 typedef pair<GLdouble, GLdouble> Pos2D;
 
 enum MenuEntries {MENU_PRIMITIVE_POINTS, MENU_PRIMITIVE_LINES,
-	MENU_PRIMITIVE_LINE_STRIP,
-	MENU_PRIMITIVE_LOOP,
-	MENU_PRIMITIVE_TRIANGLES,
-	MENU_PRIMITIVE_TRIANGLE_STRIP,
-	MENU_PRIMITIVE_FAN,
-	MENU_PRIMITIVE_QUADS,
-	MENU_PRIMITIVE_QUAD_STRIP,
-	MENU_CLEAR,
-	MENU_EXIT};
+    MENU_PRIMITIVE_LINE_STRIP,
+    MENU_PRIMITIVE_LOOP,
+    MENU_PRIMITIVE_TRIANGLES,
+    MENU_PRIMITIVE_TRIANGLE_STRIP,
+    MENU_PRIMITIVE_FAN,
+    MENU_PRIMITIVE_QUADS,
+    MENU_PRIMITIVE_QUAD_STRIP,
+    MENU_CLEAR,
+    MENU_EXIT};
 
 GLint viewport[4];
 GLdouble mvMatrix[16];
@@ -190,9 +191,9 @@ void mouseHandler(int button, int state, int x, int y) {
 
 void mouseMotionHandler (int x, int y)
 {
-	if (!isDragging) return;
-	/* we can use the following for later ! */
-	cout << __PRETTY_FUNCTION__ << " mouse drag " <<  x << " " << y << endl;
+    if (!isDragging) return;
+    /* we can use the following for later ! */
+    //cout << __PRETTY_FUNCTION__ << " mouse drag " <<  x << " " << y << endl;
 }
 
 /********************************************************************/
@@ -200,19 +201,19 @@ void mouseMotionHandler (int x, int y)
 /********************************************************************/
 void keyHandler (unsigned char ch, int x, int y)
 {
-	cout << glutGetModifiers() << endl;
-	switch (ch)
-	{
-	case 0x1B: /* escape key */
-		exit (0);
-	}
+    cout << glutGetModifiers() << endl;
+    switch (ch)
+    {
+    case 0x1B: /* escape key */
+        exit (0);
+    }
 
 }
 
 void fkeyHandler (int key, int x, int y)
 {
-	if (key == GLUT_KEY_F12)
-		exit (0);
+    if (key == GLUT_KEY_F12)
+        exit (0);
 }
 
 /********************************************************************/
@@ -220,22 +221,22 @@ void fkeyHandler (int key, int x, int y)
 /********************************************************************/
 void topMenuHandler (int select)
 {
-	switch (select)
-	{
-	case MENU_EXIT:
-		exit (0);
-	case MENU_CLEAR:
-		vertices.clear();
-		break;
-	}
+    switch (select)
+    {
+    case MENU_EXIT:
+        exit (0);
+    case MENU_CLEAR:
+        vertices.clear();
+        break;
+    }
 
-	glutPostRedisplay(); /* request display refresh */
+    glutPostRedisplay(); /* request display refresh */
 }
 
 void primitiveSelector (int select)
 {
-	current_primitive = (MenuEntries)select;
-	glutPostRedisplay(); /* request display refresh */
+    current_primitive = (MenuEntries)select;
+    glutPostRedisplay(); /* request display refresh */
 }
 
 /********************************************************************/
@@ -243,75 +244,75 @@ void primitiveSelector (int select)
 /********************************************************************/
 void initStates()
 {
-	current_primitive = MENU_PRIMITIVE_POINTS;
-	isDragging = false;
-	fill (bgColor, bgColor + 3, 0.0);
+    current_primitive = MENU_PRIMITIVE_POINTS;
+    isDragging = false;
+    fill (bgColor, bgColor + 3, 0.0);
 
-	glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.0);
+    glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.0);
 
-	glLineWidth(2.0);
-	glPointSize(3.0);
+    glLineWidth(2.0);
+    glPointSize(3.0);
 
-	/* render front polygons (CCW) as filled faces */
-	glPolygonMode(GL_FRONT, GL_FILL);
+    /* render front polygons (CCW) as filled faces */
+    glPolygonMode(GL_FRONT, GL_FILL);
 
-	/* render back polygon (CW) as outline */
-	glPolygonMode(GL_BACK, GL_LINE);
+    /* render back polygon (CW) as outline */
+    glPolygonMode(GL_BACK, GL_LINE);
 
 }
 
 void initMenus()
 {
-	int primMenu;
-	primMenu = glutCreateMenu(primitiveSelector);
-	glutAddMenuEntry("Points", MENU_PRIMITIVE_POINTS);
-	glutAddMenuEntry("Lines", MENU_PRIMITIVE_LINES);
-	glutAddMenuEntry("Line Loop", MENU_PRIMITIVE_LOOP);
-	glutAddMenuEntry("Line Strip", MENU_PRIMITIVE_LINE_STRIP);
-	glutAddMenuEntry("Triangles", MENU_PRIMITIVE_TRIANGLES);
-	glutAddMenuEntry("Triangle Strip", MENU_PRIMITIVE_TRIANGLE_STRIP);
-	glutAddMenuEntry("Quads", MENU_PRIMITIVE_QUADS);
-	glutAddMenuEntry("Quad Strip", MENU_PRIMITIVE_QUAD_STRIP);
-	glutAddMenuEntry("Triangle Fan", MENU_PRIMITIVE_FAN);
+    int primMenu;
+    primMenu = glutCreateMenu(primitiveSelector);
+    glutAddMenuEntry("Points", MENU_PRIMITIVE_POINTS);
+    glutAddMenuEntry("Lines", MENU_PRIMITIVE_LINES);
+    glutAddMenuEntry("Line Loop", MENU_PRIMITIVE_LOOP);
+    glutAddMenuEntry("Line Strip", MENU_PRIMITIVE_LINE_STRIP);
+    glutAddMenuEntry("Triangles", MENU_PRIMITIVE_TRIANGLES);
+    glutAddMenuEntry("Triangle Strip", MENU_PRIMITIVE_TRIANGLE_STRIP);
+    glutAddMenuEntry("Quads", MENU_PRIMITIVE_QUADS);
+    glutAddMenuEntry("Quad Strip", MENU_PRIMITIVE_QUAD_STRIP);
+    glutAddMenuEntry("Triangle Fan", MENU_PRIMITIVE_FAN);
 
-	menuMap[MENU_PRIMITIVE_POINTS] = GL_POINTS;
-	menuMap[MENU_PRIMITIVE_LINES] = GL_LINES;
-	menuMap[MENU_PRIMITIVE_LOOP] = GL_LINE_LOOP;
-	menuMap[MENU_PRIMITIVE_LINE_STRIP] = GL_LINE_STRIP;
-	menuMap[MENU_PRIMITIVE_TRIANGLES] = GL_TRIANGLES;
-	menuMap[MENU_PRIMITIVE_TRIANGLE_STRIP] = GL_TRIANGLE_STRIP;
-	menuMap[MENU_PRIMITIVE_FAN] = GL_TRIANGLE_FAN;
-	menuMap[MENU_PRIMITIVE_QUADS] = GL_QUADS;
-	menuMap[MENU_PRIMITIVE_QUAD_STRIP] = GL_QUAD_STRIP;
+    menuMap[MENU_PRIMITIVE_POINTS] = GL_POINTS;
+    menuMap[MENU_PRIMITIVE_LINES] = GL_LINES;
+    menuMap[MENU_PRIMITIVE_LOOP] = GL_LINE_LOOP;
+    menuMap[MENU_PRIMITIVE_LINE_STRIP] = GL_LINE_STRIP;
+    menuMap[MENU_PRIMITIVE_TRIANGLES] = GL_TRIANGLES;
+    menuMap[MENU_PRIMITIVE_TRIANGLE_STRIP] = GL_TRIANGLE_STRIP;
+    menuMap[MENU_PRIMITIVE_FAN] = GL_TRIANGLE_FAN;
+    menuMap[MENU_PRIMITIVE_QUADS] = GL_QUADS;
+    menuMap[MENU_PRIMITIVE_QUAD_STRIP] = GL_QUAD_STRIP;
 
-	glutCreateMenu(topMenuHandler);
-	glutAddSubMenu("Primitives", primMenu);
-	glutAddMenuEntry ("Clear", MENU_CLEAR);
-	glutAddMenuEntry ("Exit (F12)", MENU_EXIT);
+    glutCreateMenu(topMenuHandler);
+    glutAddSubMenu("Primitives", primMenu);
+    glutAddMenuEntry ("Clear", MENU_CLEAR);
+    glutAddMenuEntry ("Exit (F12)", MENU_EXIT);
 
-	/* Activate the menu from the right-button */
-	glutAttachMenu(GLUT_RIGHT_BUTTON);
+    /* Activate the menu from the right-button */
+    glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
 int main (int argc, char** argv)
 {
-	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-	glutInitWindowSize (600, 450);
-	glutCreateWindow("Simple GLUT");
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+    glutInitWindowSize (600, 450);
+    glutCreateWindow("Simple GLUT");
 
-	/* initial setup */
-	initStates();
-	initMenus();
+    /* initial setup */
+    initStates();
+    initMenus();
 
-	/* setup callback functions */
-	glutDisplayFunc(render);
-	glutReshapeFunc(resize);
-	glutKeyboardFunc(keyHandler);
-	glutSpecialFunc(fkeyHandler);
-	glutMouseFunc(mouseHandler);
-	glutMotionFunc(mouseMotionHandler);
-	glutMainLoop();
+    /* setup callback functions */
+    glutDisplayFunc(render);
+    glutReshapeFunc(resize);
+    glutKeyboardFunc(keyHandler);
+    glutSpecialFunc(fkeyHandler);
+    glutMouseFunc(mouseHandler);
+    glutMotionFunc(mouseMotionHandler);
+    glutMainLoop();
 }
 
 

@@ -1,4 +1,5 @@
 
+
 /**
  * This class is designed as the parent class for both WorldView and
  * CameraView. The only important function in this class is
@@ -17,10 +18,12 @@ using namespace std;
 //using namespace boost::numeric::ublas;
 
 GLPanel::GLPanel (QWidget * parent, const char *name):QGLWidget (parent,
-   name),
-eye (3),
-focus (3)
+   name)
+//eye (3),
+//focus (3)
 {
+	eye.resize(3);
+	focus.resize(3);
    eye[0] = eye[1] = 0;
    eye[2] = 2;
    focus[0] = focus[1] = focus[2] = 0;
@@ -140,7 +143,7 @@ void GLPanel::initializeGL ()
    glVertex3f (LEN, 0.0, 0.0);
    glEnd ();
 
-   glColor4ub (51, 204, 255, 127);
+   glColor4ub (0, 255, 0, 127);
    glBegin (GL_LINE_STRIP);
    glVertex3f (0.0, 0.0, 0.0);
    glVertex3f (0.0, LEN, 0.0);
@@ -152,7 +155,7 @@ void GLPanel::initializeGL ()
    glVertex3f (0.0, LEN, 0.0);
    glEnd ();
 
-   glColor4ub (0, 255, 0, 127);
+   glColor4ub (51, 204, 255, 127);
    glBegin (GL_LINE_STRIP);
    glVertex3f (0.0, 0.0, 0.0);
    glVertex3f (0.0, 0.0, LEN);
@@ -163,6 +166,7 @@ void GLPanel::initializeGL ()
    glVertex3f (0.0, -ARR, LEN - ARR);
    glVertex3f (0.0, 0.0, LEN);
    glEnd ();
+
    glColor4ub (255, 255, 0, 127);
    glRasterPos3f (1.1, 0.0, 0.0);
    glutBitmapCharacter (GLUT_BITMAP_HELVETICA_12, 'x');
@@ -241,7 +245,7 @@ void GLPanel::paintGL ()
           * end at the current step. Otherwise, the concatenation
           * include ALL transformations in the list */
          if (current_step != NULL)
-            /*it_end =*/ std::find (trsf->begin (), trsf->end (), const_cast<GLTransform*>(current_step));
+            it_end = std::find (trsf->begin (), trsf->end (), const_cast<GLTransform*>(current_step));
          else
             it_end = trsf->end() - 1;
          for (it = it_beg; it != it_end; ++it) {
