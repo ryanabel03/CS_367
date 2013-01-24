@@ -39,11 +39,19 @@ map<MenuEntries,unsigned int> menuMap;
 bool isDragging;
 float bgColor[3];
 
+/********************************************************************/
+// Display callback
+/********************************************************************/
 void render(void)
 {
 //	cout << __PRETTY_FUNCTION__ << endl;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    glBegin(GL_TRIANGLES);
+    glVertex2f(0.3, 1.0);
+    glVertex2f(0.7, 1.0);
+    glVertex2f(0.5, -1.5);
+    glEnd();
 	glPolygonMode(GL_FRONT, GL_FILL);
 	glColor3ub(255, 255, 0); /* render filled polygons in yellow */
 	glBegin(menuMap[current_primitive]);
@@ -52,6 +60,7 @@ void render(void)
 		glVertex2d(vit->first, vit->second);
 	glEnd();
 
+    
 	if (current_primitive >= MENU_PRIMITIVE_TRIANGLES) {
 		/* render the wireframe outline of the polygons in green */
 		glPolygonMode(GL_FRONT, GL_LINE);
@@ -75,6 +84,9 @@ void render(void)
 	glutSwapBuffers();
 }
 
+/********************************************************************/
+// Resize callback
+/********************************************************************/
 void resize (int w, int h)
 {
 	glViewport(0, 0, (GLint) w, (GLint) h);
@@ -86,6 +98,7 @@ void resize (int w, int h)
 	glLoadIdentity();
 
 	GLfloat ratio;
+#if 0
 	if (w <= h) {
 		ratio = static_cast<GLfloat> (h) / w;
 		gluOrtho2D(-4.0, 4.0, -4.0 * ratio, 4.0 * ratio);
@@ -94,12 +107,37 @@ void resize (int w, int h)
 		ratio = static_cast<GLfloat> (w) / h;
 		gluOrtho2D(-4.0 * ratio, 4.0 * ratio, -4.0, 4.0);
 	}
+#else
+    gluPerspective(60, (float)w/h, 1, 10);
+#endif
 	glGetDoublev(GL_PROJECTION_MATRIX, prMatrix);
+    /* always switch back to MODEVLVIEW matrix mode !!!! */
 	glMatrixMode (GL_MODELVIEW);
 	glLoadIdentity();
+#if 1
+    gluLookAt(0, 0, 2.5, 0, 0, 0, 0, 1, 0);
+#endif
 	glGetDoublev(GL_MODELVIEW_MATRIX, mvMatrix);
 }
 
+#if 0
+The "magic" behind gluUnProject:
+
+Imagine your pupil (right or left) is the (0,0,0) of the camera
+coordinate frame.
+Now select a point on this screen and draw an infinite ray between
+your pupil and the point and the screen. This ray will intersect
+the view volume at the near plane (R) and far plane (S). Which intersection
+returned depends on the third argument passed to gluUnproject (0.0) returns
+the near intersection and 1.0 returns the far intersection.
+
+gluUnproject calculates the coordinates of R and S with respect to the WORLD
+coordinate frame.
+#endif
+
+/********************************************************************/
+// Mouse callback
+/********************************************************************/
 void mouseHandler(int button, int state, int x, int y) {
 	if (button != GLUT_LEFT_BUTTON)
 		return;
@@ -107,26 +145,48 @@ void mouseHandler(int button, int state, int x, int y) {
 	if (state == GLUT_DOWN) {
 		/* Use Shift-LeftMouse to add a vertex */
 		if (glutGetModifiers() == GLUT_ACTIVE_SHIFT) {
-			GLdouble wx, wy, wz;
+			GLdouble wx1, wy1, wz1;
+            GLdouble wx0, wy0, wz0;
 
 			/* (x,y) is the position of the mouse on the SCREEN where
 			 * y is positive towards the bottom of the screen.
 			 *
-			 * Use "unproject" to convert the screen coordinate to
-			 * the world coordinate. Modify the y-input so it is zero
+             * Modify the y-input so it is zero
 			 * at the bottom of the screen and positive at the top
 			 * of the screen
 			 */
-			gluUnProject(x, viewport[3] - y - 1, 0.0, mvMatrix, prMatrix,
-					viewport, &wx, &wy, &wz);
+            /* determine the world coordinate of our eye projection on the
+             * far plane */
+			gluUnProject(x, viewport[3] - y - 1, 1.0, mvMatrix, prMatrix,
+					viewport, &wx1, &wy1, &wz1);
 
+            /* determine the world coordinate of our eye projection on the
+             * near plane */
+			gluUnProject(x, viewport[3] - y - 1, 0.0, mvMatrix, prMatrix,
+                         viewport, &wx0, &wy0, &wz0);
+
+
+            /* the parametric equation of the eye ray is
+             *
+             * [ x ]   [ wx0 ]          [ wx1 - wx0 ]
+             * [ y ] = [ wy0 ]  + alpha [ wy1 - wy0 ]
+             * [ z ]   [ wz0 ]          [ wz1 - wz0 ]
+             *
+             * to determine where the above line intersects the XY plane,
+             * we set z to zero and solve for alpha. Then we can calculate
+             *    x = wx0 + alpha (wx1 - wx0)
+             *    y = wy0 + alpha (wy1 - wy0)
+             */
+            double alpha = wz0 /(wz0 - wz1);
+			vertices.push_back(std::make_pair(wx0 + alpha * (wx1 - wx0),
+                                              wy0 + alpha * (wy1 - wy0)));
 			/* store the vertex position (in the world coordinate) */
-			vertices.push_back(std::make_pair(wx, wy));
 			glutPostRedisplay(); /* request display refresh */
 		}
 	}
 	isDragging = state == GLUT_DOWN;
 }
+
 
 void mouseMotionHandler (int x, int y)
 {
@@ -135,6 +195,9 @@ void mouseMotionHandler (int x, int y)
 	cout << __PRETTY_FUNCTION__ << " mouse drag " <<  x << " " << y << endl;
 }
 
+/********************************************************************/
+// Keyboard callback
+/********************************************************************/
 void keyHandler (unsigned char ch, int x, int y)
 {
 	cout << glutGetModifiers() << endl;
@@ -152,6 +215,9 @@ void fkeyHandler (int key, int x, int y)
 		exit (0);
 }
 
+/********************************************************************/
+// Menu handlers
+/********************************************************************/
 void topMenuHandler (int select)
 {
 	switch (select)
@@ -172,6 +238,9 @@ void primitiveSelector (int select)
 	glutPostRedisplay(); /* request display refresh */
 }
 
+/********************************************************************/
+// Initialization routines
+/********************************************************************/
 void initStates()
 {
 	current_primitive = MENU_PRIMITIVE_POINTS;
@@ -190,7 +259,6 @@ void initStates()
 	glPolygonMode(GL_BACK, GL_LINE);
 
 }
-
 
 void initMenus()
 {
