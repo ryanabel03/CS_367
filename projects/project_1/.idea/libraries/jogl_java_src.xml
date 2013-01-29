@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="jogl-java-src">
+    <CLASSES />
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/Downloads/jogamp-all-platforms/jogl-java-src.zip!/" />
+    </SOURCES>
+  </library>
+</component>
