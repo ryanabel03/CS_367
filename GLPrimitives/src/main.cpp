@@ -37,6 +37,8 @@ GLdouble prMatrix[16];
 MenuEntries current_primitive;
 vector<Pos2D> vertices;
 map<MenuEntries,unsigned int> menuMap;
+int tri_list, c_list; /* declare the two list handles */
+int ct_list;
 bool isDragging;
 float bgColor[3];
 
@@ -48,11 +50,18 @@ void render(void)
 //	cout << __PRETTY_FUNCTION__ << endl;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glBegin(GL_TRIANGLES);
-    glVertex2f(0.3, 1.0);
-    glVertex2f(0.7, 1.0);
-    glVertex2f(0.5, -1.5);
-    glEnd();
+    glPushMatrix();
+    glTranslatef (-0.5, 0, 0);
+    glScalef(0.5, 2.0, 1);
+    glCallList(ct_list);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef (0.5, 0, 0);
+    glRotatef(30, 1, 0, 0);  /* rotate 30 around the x-axis */
+    glCallList(ct_list);
+    glPopMatrix();
+
 	glPolygonMode(GL_FRONT, GL_FILL);
 	glColor3ub(255, 255, 0); /* render filled polygons in yellow */
 	glBegin(menuMap[current_primitive]);
@@ -116,7 +125,7 @@ void resize (int w, int h)
 	glMatrixMode (GL_MODELVIEW);
 	glLoadIdentity();
 #if 1
-    gluLookAt(0, 0, 2.5, 0, 0, 0, 0, 1, 0);
+    gluLookAt(0, 0, 5.0, 0, 0, 0, 0, 1, 0);
 #endif
 	glGetDoublev(GL_MODELVIEW_MATRIX, mvMatrix);
 }
@@ -244,6 +253,67 @@ void primitiveSelector (int select)
 /********************************************************************/
 void initStates()
 {
+    /* create two separate display lists */
+    tri_list = glGenLists(1);
+    c_list = glGenLists(1);
+
+    /* populate each list here, compile only do not execute the list */
+    glNewList(tri_list, GL_COMPILE);
+    glBegin(GL_TRIANGLES);
+    glColor3ub (0, 0, 200);
+    glVertex2f(0.3, 1.0);
+    glVertex2f(-0.7, 1.0);
+    glColor3ub (0, 100, 200);
+    glVertex2f(0.5, -1.0);
+    glEnd();
+    glEndList();
+
+    /* populate each list here */
+    glNewList(c_list, GL_COMPILE);
+    /* letter C (crooked!) */
+    glBegin(GL_QUAD_STRIP);
+    glColor3f (1.0, .4, .25);
+    glVertex2f(0.5, 0.5);
+    glVertex2f(0.6, 0.6);
+    glVertex2f(0.1, 0.5);
+    glVertex2f(0.05, 0.8);
+    glVertex2f(-0.2, 0.3);
+    glVertex2f(-0.5, 0.6);
+    glColor3f (1.0, .4, .25);
+    glVertex2f(-0.3, 0);
+    glVertex2f(-0.75, 0);
+    glVertex2f(-0.3, -0.3);
+    glVertex2f(-0.5, -0.7);
+    glVertex2f(0.2, -0.45);
+    glVertex2f(0.2, -0.8);
+    glEnd();
+    glEndList();
+
+
+    ct_list = glGenLists(1);
+    glNewList(ct_list, GL_COMPILE);
+    glCallList(tri_list);   /* render the triangle in the list */
+    glPushMatrix();
+    glTranslatef(-0.7, 1.0, 0);
+    glRotatef(-60, 0, 0, 1);
+    glCallList(c_list);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(0.3, 1.0, 0);
+    glRotatef(-120, 0, 0, 1);
+    glCallList(c_list);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(0.5, -1.0, 0);
+    glRotatef(90, 0, 0, 1);
+    glScalef(0.3, 0.3, 1.0);
+    glCallList(c_list);
+    glPopMatrix();
+
+    glEndList();
+
     current_primitive = MENU_PRIMITIVE_POINTS;
     isDragging = false;
     fill (bgColor, bgColor + 3, 0.0);
