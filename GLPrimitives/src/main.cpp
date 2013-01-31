@@ -51,8 +51,8 @@ void render(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glPushMatrix();
-    glTranslatef (-0.5, 0, 0);
-    glScalef(0.5, 2.0, 1);
+    glTranslatef (-0.5, 0, 0.0);
+    glScalef(0.5, 1.0, 1);
     glCallList(ct_list);
     glPopMatrix();
 
@@ -260,11 +260,9 @@ void initStates()
     /* populate each list here, compile only do not execute the list */
     glNewList(tri_list, GL_COMPILE);
     glBegin(GL_TRIANGLES);
-    glColor3ub (0, 0, 200);
-    glVertex2f(0.3, 1.0);
-    glVertex2f(-0.7, 1.0);
-    glColor3ub (0, 100, 200);
-    glVertex2f(0.5, -1.0);
+    glVertex2f(0.4, 1.0);
+    glVertex2f(-0.4, 1.0);
+    glVertex2f(0.0, -1.0);
     glEnd();
     glEndList();
 
@@ -274,17 +272,27 @@ void initStates()
     glBegin(GL_QUAD_STRIP);
     glColor3f (1.0, .4, .25);
     glVertex2f(0.5, 0.5);
+    glColor3f (0.8, .4, .75);
     glVertex2f(0.6, 0.6);
+    glColor3f (1.0, .5, .25);
     glVertex2f(0.1, 0.5);
+    glColor3f (0.7, .4, .75);
     glVertex2f(0.05, 0.8);
+    glColor3f (1.0, .6, .25);
     glVertex2f(-0.2, 0.3);
+    glColor3f (0.6, .4, .75);
     glVertex2f(-0.5, 0.6);
-    glColor3f (1.0, .4, .25);
+    glColor3f (1.0, .7, .25);
     glVertex2f(-0.3, 0);
+    glColor3f (0.5, .4, .75);
     glVertex2f(-0.75, 0);
+    glColor3f (1.0, .8, .25);
     glVertex2f(-0.3, -0.3);
+    glColor3f (0.4, .4, .75);
     glVertex2f(-0.5, -0.7);
+    glColor3f (1.0, .9, .25);
     glVertex2f(0.2, -0.45);
+    glColor3f (0.3, .4, .75);
     glVertex2f(0.2, -0.8);
     glEnd();
     glEndList();
@@ -294,21 +302,21 @@ void initStates()
     glNewList(ct_list, GL_COMPILE);
     glCallList(tri_list);   /* render the triangle in the list */
     glPushMatrix();
-    glTranslatef(-0.7, 1.0, 0);
+    glTranslatef(-0.4, 1.0, 0.1);
     glRotatef(-60, 0, 0, 1);
     glCallList(c_list);
     glPopMatrix();
 
     glPushMatrix();
-    glTranslatef(0.3, 1.0, 0);
+    glTranslatef(0.4, 1.0, 0);
     glRotatef(-120, 0, 0, 1);
     glCallList(c_list);
     glPopMatrix();
 
     glPushMatrix();
-    glTranslatef(0.5, -1.0, 0);
+    glTranslatef(0.0, -1.0, 0);
     glRotatef(90, 0, 0, 1);
-    glScalef(0.3, 0.3, 1.0);
+    glScalef(0.4, 0.4, 1.0);
     glCallList(c_list);
     glPopMatrix();
 
@@ -328,6 +336,10 @@ void initStates()
 
     /* render back polygon (CW) as outline */
     glPolygonMode(GL_BACK, GL_LINE);
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
 }
 

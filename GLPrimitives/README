@@ -9,12 +9,25 @@ On Windows, follow the instruction found at one of the following sites:
      http://user.xmission.com/\~nate/glut.html
      http://www.opengl.org/resources/libraries/glut/
 
-Steps to compile:
+Steps to compile On Linux:
 (1) mkdir build
 (2) cd build
 (3) cmake ../src
-(4a) make     # on Linux/Mac
-(4b) nmake    # on Windows
+(4) make
+
+Steps to compile on Mac (using Xcode)
+(1) mkdir build
+(2) cd build
+(3) cmake -GXcode ../src
+(4) open the Xcode project file
+
+Under the "Product" menu, Select "Manage Schemes" to enable only the "gp" target
+
+Steps to compile on Windows:
+(1) mkdir build
+(2) cd build
+(3) cmake ../src
+(4) nmake
 
 A binary executable gp[.exe] should be found under the "build" directory
 
