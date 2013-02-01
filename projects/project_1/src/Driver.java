@@ -9,6 +9,7 @@ public class Driver {
         frame.add(canvas);
         frame.setSize(600, 600);
         frame.setVisible(true);
+        canvas.requestFocus();
     }
 
     public static void main(String[] args) {
