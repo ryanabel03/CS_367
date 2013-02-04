@@ -9,27 +9,34 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class Bowling extends GLCanvas implements GLEventListener, KeyListener {
+    final static float UNIT = 0.2F;
     int pin_list;
     GLU glu;
-    float distance, x, y;
+    float z, x, y, refz, refx, refy;
 
     public Bowling(GLCapabilities capabilities) {
         super(capabilities);
         glu = new GLU();
-        distance = 10;
-        x = 5;
-        y = 15;
+        setDefault();
 
         this.addGLEventListener((GLEventListener)this);
         this.addKeyListener(this);
     }
 
+    private void setDefault()
+    {
+        z = 3;
+        x = 0;
+        y = 0;
+        refz = 0;
+        refx = 0;
+        refy = 0;
+    }
+
     private void render(GL2 gl, int width, int height)
     {
+        gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         gl.glPushMatrix();
-        gl.glClear(GL.GL_COLOR_BUFFER_BIT);
-        gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
-        gl.glLoadIdentity();
         gl.glCallList(pin_list);
         gl.glTranslatef(5,5,0);
         gl.glCallList(pin_list);
@@ -43,10 +50,10 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener {
 
         float widthHeightRatio = (float) getWidth() / (float) getHeight();
         glu.gluPerspective(90, widthHeightRatio, 1, 100);
-        glu.gluLookAt(x,y,distance,0,0,0,0,1,0);
 
         gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadIdentity();
+        glu.gluLookAt(x,y,z,refx,refy,refz,0,1,0);
     }
 
     /* KeyListener */
@@ -55,36 +62,44 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener {
         int keyCode = e.getKeyCode();
         switch(keyCode) {
             case KeyEvent.VK_UP:
-                y += 1;
-                display();
+                y += UNIT;
+                refy += UNIT;
                 break;
             case KeyEvent.VK_DOWN:
-                y -= 1;
-                display();
+                y -= UNIT;
+                refy -= UNIT;
                 break;
             case KeyEvent.VK_LEFT:
-                x -= 1;
-                display();
+                x -= UNIT;
+                refx -= UNIT;
                 break;
             case KeyEvent.VK_RIGHT :
-                x += 1;
-                display();
+                x += UNIT;
+                refx += UNIT;
                 break;
             case KeyEvent.VK_W:
-                distance -= 1;
-                display();
+                refy -= UNIT;
+                break;
+            case KeyEvent.VK_A:
+                refx -= UNIT;
                 break;
             case KeyEvent.VK_S :
-                distance += 1;
-                display();
+                refy += UNIT;
+                break;
+            case KeyEvent.VK_D :
+                refx += UNIT;
+                break;
+            case KeyEvent.VK_EQUALS:
+                z -= UNIT;
+                break;
+            case KeyEvent.VK_MINUS:
+                z += UNIT;
                 break;
             case KeyEvent.VK_R:
-                distance = 10;
-                x = 5;
-                y = 15;
-                display();
+                setDefault();
                 break;
         }
+        display();
     }
 
     public void keyReleased(KeyEvent e)
@@ -110,7 +125,6 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener {
         {
             theta = (float) (i / 50.0 * 2 * Math.PI);
             radius1 = 0.5f;
-            radius2 = 0.5f;
             z = 0;
             x = (float) (radius1 * Math.cos(theta));
             y = (float) (radius1 * Math.sin(theta));
@@ -118,6 +132,7 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener {
             gl.glVertex3f(x, y, z);
             z += 0.5;
 
+            radius2 = 0.1f;
             x = (float) (radius2 * Math.cos(theta));
             y = (float) (radius2 * Math.sin(theta));
             gl.glColor3f(0,0.5f,0);
@@ -133,8 +148,8 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener {
 
     public void display(GLAutoDrawable glAutoDrawable) {
         GL2 gl = glAutoDrawable.getGL().getGL2();
-        render(gl, glAutoDrawable.getWidth(), glAutoDrawable.getHeight());
         setCamera(gl);
+        render(gl, glAutoDrawable.getWidth(), glAutoDrawable.getHeight());
     }
 
     public void reshape(GLAutoDrawable glAutoDrawable, int i, int i2, int width, int height) {
