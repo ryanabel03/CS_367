@@ -1,19 +1,19 @@
-import com.jogamp.opengl.util.awt.TextRenderer;
-
-import java.awt.Font;
-
 import javax.media.opengl.*;
 import javax.media.opengl.fixedfunc.GLMatrixFunc;
 import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.glu.GLU;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
+import java.awt.Point;
 
-public class Bowling extends GLCanvas implements GLEventListener, KeyListener {
-    final static float UNIT = 0.2F;
+public class Bowling extends GLCanvas implements GLEventListener, KeyListener, MouseMotionListener, MouseWheelListener {
+    /* SETTINGS */
+    final static float KEY_SPEED = 0.2F;
+    final static float SCROLL_SPEED = 0.1F;
+    final static float MOUSE_SPEED = .003F;
+
     int pin_list;
     GLU glu;
-    float z, x, y, refz, refx, refy;
+    float eyeZ, eyeX, eyeY, refZ, refX, refY, upZ, upX, upY;
     float rShade, gShade, bShade;
 
     public Bowling(GLCapabilities capabilities) {
@@ -21,17 +21,22 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener {
         glu = new GLU();
         setDefault();
 
-        this.addGLEventListener((GLEventListener) this);
+        this.addGLEventListener(this);
         this.addKeyListener(this);
+        this.addMouseMotionListener(this);
+        this.addMouseWheelListener(this);
     }
 
     private void setDefault() {
-        z = 3;
-        x = 0;
-        y = 0;
-        refz = 0;
-        refx = 0;
-        refy = 0;
+        eyeZ = 5;
+        eyeX = 0;
+        eyeY = 0;
+        refZ = 0;
+        refX = 0;
+        refY = 0;
+        upZ = 0;
+        upX = 0;
+        upY = 1;
     }
 
     private void createPinList(GL2 gl) {
@@ -234,11 +239,12 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener {
             gl.glEnd();
         }
 
-        gl.glColor3f(rShade, gShade, bShade);
         for (float i = 0; i <= 50; i++) {
+            gl.glBegin(GL2.GL_TRIANGLE_FAN);/* f1: front */
             theta = (float) (i / 50.0 * 2 * Math.PI);
             x = (float) (radius1 * Math.cos(theta));
             y = (float) (radius1 * Math.sin(theta));
+            gl.glColor3f(rShade, gShade, bShade);
             gl.glVertex3f(x, y, z);
         }
         gl.glEnd();
@@ -258,15 +264,25 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener {
         gl.glPushMatrix();
         gl.glTranslatef(0,-1,0);
         gl.glRotatef(-90,1,0,0);
-        gl.glCallList(pin_list);
-        gl.glTranslatef(1,0,0);
-        gl.glCallList(pin_list);
-        gl.glTranslatef(1,0,0);
-        gl.glCallList(pin_list);
-        gl.glTranslatef(-1.33f,-1,0);
-        gl.glCallList(pin_list);
-        gl.glTranslatef(0.67f,0,0);
-        gl.glCallList(pin_list);
+        gl.glCallList(pin_list); //7
+        gl.glTranslatef(.67f,0,0);
+        gl.glCallList(pin_list); //8
+        gl.glTranslatef(.67f,0,0);
+        gl.glCallList(pin_list); //9
+        gl.glTranslatef(.67f,0,0);
+        gl.glCallList(pin_list); //10
+        gl.glTranslatef(-1.67f,-.5f,0);
+        gl.glCallList(pin_list); //4
+        gl.glTranslatef(.67f,0,0);
+        gl.glCallList(pin_list); //5
+        gl.glTranslatef(.67f,0,0);
+        gl.glCallList(pin_list); //6
+        gl.glTranslatef(-1,-.5f,0);
+        gl.glCallList(pin_list); //2
+        gl.glTranslatef(.67f,0,0);
+        gl.glCallList(pin_list); //3
+        gl.glTranslatef(-.33f,-.5f,0);
+        gl.glCallList(pin_list); //1
         gl.glPopMatrix();
     }
 
@@ -279,7 +295,7 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener {
 
         gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadIdentity();
-        glu.gluLookAt(x, y, z, refx, refy, refz, 0, 1, 0);
+        glu.gluLookAt(eyeX, eyeY, eyeZ, refX, refY, refZ, upX, upY, upZ);
     }
 
     /* KeyListener */
@@ -287,46 +303,40 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener {
         int keyCode = e.getKeyCode();
         switch (keyCode) {
             case KeyEvent.VK_UP:
-                y += UNIT;
-                refy += UNIT;
+                eyeY += KEY_SPEED;
+                refY += KEY_SPEED;
                 break;
             case KeyEvent.VK_DOWN:
-                y -= UNIT;
-                refy -= UNIT;
+                eyeY -= KEY_SPEED;
+                refY -= KEY_SPEED;
                 break;
             case KeyEvent.VK_LEFT:
-                x -= UNIT;
-                refx -= UNIT;
+                eyeX -= KEY_SPEED;
+                refX -= KEY_SPEED;
                 break;
             case KeyEvent.VK_RIGHT:
-                x += UNIT;
-                refx += UNIT;
+                eyeX += KEY_SPEED;
+                refX += KEY_SPEED;
                 break;
             case KeyEvent.VK_W:
-                refy += UNIT;
+                refY += KEY_SPEED;
                 break;
             case KeyEvent.VK_A:
-                refx -= UNIT;
+                refX -= KEY_SPEED;
                 break;
             case KeyEvent.VK_S:
-                refy -= UNIT;
+                refY -= KEY_SPEED;
                 break;
             case KeyEvent.VK_D:
-                refx += UNIT;
+                refX += KEY_SPEED;
                 break;
             case KeyEvent.VK_EQUALS:
-                z -= UNIT;
+                eyeZ -= KEY_SPEED;
+                refZ -= KEY_SPEED;
                 break;
             case KeyEvent.VK_MINUS:
-                z += UNIT;
-                break;
-            case KeyEvent.VK_1:
-                z += UNIT;
-                refz += UNIT;
-                break;
-            case KeyEvent.VK_2:
-                z -= UNIT;
-                refz -= UNIT;
+                eyeZ += KEY_SPEED;
+                refZ += KEY_SPEED;
                 break;
             case KeyEvent.VK_R:
                 setDefault();
@@ -365,5 +375,26 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener {
         GL2 gl = glAutoDrawable.getGL().getGL2();
         gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);
         gl.glLoadIdentity();
+    }
+
+    /* MouseMotionListener */
+    public void mouseDragged(MouseEvent e)
+    {
+    }
+
+    public void mouseMoved(MouseEvent e)
+    {
+        Point p = e.getPoint();
+        refX = (float)p.getX() * MOUSE_SPEED;
+        refY = -(float)p.getY() * MOUSE_SPEED;
+
+        display();
+    }
+
+    /* MouseWheelListener */
+    public void mouseWheelMoved(MouseWheelEvent e)
+    {
+        float notches = e.getWheelRotation();
+        eyeZ += notches * SCROLL_SPEED;
     }
 }
