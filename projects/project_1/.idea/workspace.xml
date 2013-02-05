@@ -6,7 +6,7 @@
     <ignored path=".idea/workspace.xml" />
     <file path="/Renderer.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1359503550303" ignored="false" />
     <file path="/fragment.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1359501503431" ignored="false" />
-    <file path="/Bowling.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1360010864287" ignored="false" />
+    <file path="/Bowling.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1360018574989" ignored="false" />
     <file path="/BowlingAWT.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1359667381130" ignored="false" />
     <file path="/Bowling2.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1359672846068" ignored="false" />
     <file path="/Driver.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1359669984709" ignored="false" />
@@ -76,7 +76,7 @@
       <file leaf-file-name="Bowling.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Bowling.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="79" column="22" selection-start="2125" selection-end="2125" vertical-scroll-proportion="0.15">
+            <state line="11" column="80" selection-start="373" selection-end="373" vertical-scroll-proportion="0.4857143">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -300,9 +300,9 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="GoToClass.includeLibraries" value="false" />
-    <property name="dynamic.classpath" value="false" />
-    <property name="options.searchVisible" value="true" />
     <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="options.searchVisible" value="true" />
+    <property name="dynamic.classpath" value="false" />
   </component>
   <component name="RunManager" selected="Application.Driver">
     <configuration default="false" name="Renderer" type="Application" factoryName="Application" temporary="true">
@@ -560,6 +560,22 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/Bowling.java">
       <provider selected="true" editor-type-id="text-editor">
+        <state line="79" column="22" selection-start="2125" selection-end="2125" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Driver.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="20" column="0" selection-start="627" selection-end="627" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Bowling.java">
+      <provider selected="true" editor-type-id="text-editor">
         <state line="80" column="16" selection-start="2808" selection-end="2808" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="imports" expanded="true" />
@@ -599,7 +615,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Bowling.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="79" column="22" selection-start="2125" selection-end="2125" vertical-scroll-proportion="0.15">
+        <state line="11" column="80" selection-start="373" selection-end="373" vertical-scroll-proportion="0.4857143">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

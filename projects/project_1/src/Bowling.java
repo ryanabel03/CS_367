@@ -1,4 +1,5 @@
 import com.jogamp.opengl.util.awt.TextRenderer;
+
 import java.awt.Font;
 
 import javax.media.opengl.*;
@@ -9,7 +10,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class Bowling extends GLCanvas implements GLEventListener, KeyListener {
-    final static float UNIT = 0.2F;
+    final static float UNIT = 0.5F;
     int pin_list;
     GLU glu;
     float z, x, y, refz, refx, refy;
@@ -19,12 +20,11 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener {
         glu = new GLU();
         setDefault();
 
-        this.addGLEventListener((GLEventListener)this);
+        this.addGLEventListener((GLEventListener) this);
         this.addKeyListener(this);
     }
 
-    private void setDefault()
-    {
+    private void setDefault() {
         z = 3;
         x = 0;
         y = 0;
@@ -33,18 +33,58 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener {
         refy = 0;
     }
 
-    private void render(GL2 gl, int width, int height)
-    {
+    private void createPinList(GL2 gl) {
+        float theta, radius1, radius2, x, y, z;
+        radius1 = 0.2f;
+        radius2 = 0.2f;
+
+        pin_list = gl.glGenLists(1);
+        gl.glNewList(pin_list, GL2.GL_COMPILE);
+        /*gl.glBegin(GL2.GL_POLYGON);
+        for (float i = 0; i <= 50; i++) {
+            theta = (float) (i / 50.0 * 2 * Math.PI);
+            z = 0;
+            x = (float) (radius1 * Math.cos(theta));
+            y = (float) (radius1 * Math.sin(theta));
+            gl.glVertex3f(x, y, z);
+        }
+        gl.glEnd();
+        */
+        gl.glBegin(GL2.GL_QUAD_STRIP);/* f1: front */
+        for (float i = 0; i <= 100; i++) {
+            for (float j = 0; j <= 50; j++) {
+                theta = (float) (j / 50.0 * 2 * Math.PI);
+                z = 0;
+                x = (float) (radius1 * Math.cos(theta));
+                y = (float) (radius1 * Math.sin(theta));
+                gl.glColor3f(0.1f, 0.3f, 0.4f);
+                if(i > 50)
+                    gl.glColor3f(0f, 1, 0.5f);
+                gl.glVertex3f(x, y, z);
+                z += 1.4;
+
+                x = (float) (radius2 * Math.cos(theta));
+                y = (float) (radius2 * Math.sin(theta));
+                gl.glColor3f(0, 0.5f, 0);
+                if(i > 50)
+                    gl.glColor3f(0f, 1, 0.5f);
+                gl.glVertex3f(x, y, z);
+            }
+            radius1 += 0.5f;
+            radius2 += 0.5f;
+        }
+        gl.glEnd();
+        gl.glEndList();
+    }
+
+    private void render(GL2 gl, int width, int height) {
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         gl.glPushMatrix();
-        gl.glCallList(pin_list);
-        gl.glTranslatef(5,5,0);
         gl.glCallList(pin_list);
         gl.glPopMatrix();
     }
 
-    private void setCamera(GL2 gl)
-    {
+    private void setCamera(GL2 gl) {
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
 
@@ -53,14 +93,13 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener {
 
         gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadIdentity();
-        glu.gluLookAt(x,y,z,refx,refy,refz,0,1,0);
+        glu.gluLookAt(x, y, z, refx, refy, refz, 0, 1, 0);
     }
 
     /* KeyListener */
-    public void keyPressed(KeyEvent e)
-    {
+    public void keyPressed(KeyEvent e) {
         int keyCode = e.getKeyCode();
-        switch(keyCode) {
+        switch (keyCode) {
             case KeyEvent.VK_UP:
                 y += UNIT;
                 refy += UNIT;
@@ -73,20 +112,20 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener {
                 x -= UNIT;
                 refx -= UNIT;
                 break;
-            case KeyEvent.VK_RIGHT :
+            case KeyEvent.VK_RIGHT:
                 x += UNIT;
                 refx += UNIT;
                 break;
             case KeyEvent.VK_W:
-                refy -= UNIT;
+                refy += UNIT;
                 break;
             case KeyEvent.VK_A:
                 refx -= UNIT;
                 break;
-            case KeyEvent.VK_S :
-                refy += UNIT;
+            case KeyEvent.VK_S:
+                refy -= UNIT;
                 break;
-            case KeyEvent.VK_D :
+            case KeyEvent.VK_D:
                 refx += UNIT;
                 break;
             case KeyEvent.VK_EQUALS:
@@ -102,12 +141,10 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener {
         display();
     }
 
-    public void keyReleased(KeyEvent e)
-    {
+    public void keyReleased(KeyEvent e) {
     }
 
-    public void keyTyped(KeyEvent e)
-    {
+    public void keyTyped(KeyEvent e) {
     }
 
     /* GLEventListener */
@@ -117,29 +154,7 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener {
         gl.glEnable(GL.GL_DEPTH_TEST);
         gl.glDepthFunc(GL.GL_LEQUAL);
 
-        pin_list = gl.glGenLists(1);
-        gl.glNewList(pin_list, GL2.GL_COMPILE);
-        gl.glBegin(GL2.GL_QUAD_STRIP);/* f1: front */
-        float theta, radius1, radius2, x, y, z;
-        for(float i = 0; i <= 50; i++)
-        {
-            theta = (float) (i / 50.0 * 2 * Math.PI);
-            radius1 = 0.5f;
-            z = 0;
-            x = (float) (radius1 * Math.cos(theta));
-            y = (float) (radius1 * Math.sin(theta));
-            gl.glColor3f(0.1f,0.3f,0.4f);
-            gl.glVertex3f(x, y, z);
-            z += 0.5;
-
-            radius2 = 0.1f;
-            x = (float) (radius2 * Math.cos(theta));
-            y = (float) (radius2 * Math.sin(theta));
-            gl.glColor3f(0,0.5f,0);
-            gl.glVertex3f(x, y, z);
-        }
-        gl.glEnd();
-        gl.glEndList();
+        createPinList(gl);
     }
 
     public void dispose(GLAutoDrawable glAutoDrawable) {
