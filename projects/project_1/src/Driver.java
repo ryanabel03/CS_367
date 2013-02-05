@@ -7,7 +7,7 @@ public class Driver {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         frame.add(canvas);
-        frame.setSize(600, 600);
+        frame.setSize(700, 700);
         frame.setVisible(true);
         canvas.requestFocus();
     }

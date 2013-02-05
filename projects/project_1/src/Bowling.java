@@ -10,10 +10,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class Bowling extends GLCanvas implements GLEventListener, KeyListener {
-    final static float UNIT = 0.5F;
+    final static float UNIT = 0.2F;
     int pin_list;
     GLU glu;
     float z, x, y, refz, refx, refy;
+    float rShade, gShade, bShade;
 
     public Bowling(GLCapabilities capabilities) {
         super(capabilities);
@@ -35,51 +36,236 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener {
 
     private void createPinList(GL2 gl) {
         float theta, radius1, radius2, x, y, z;
-        radius1 = 0.2f;
-        radius2 = 0.2f;
+        radius1 = 0.15f;
+        radius2 = 0.15f;
+        z = 0;
 
         pin_list = gl.glGenLists(1);
         gl.glNewList(pin_list, GL2.GL_COMPILE);
-        /*gl.glBegin(GL2.GL_POLYGON);
+        gl.glBegin(GL2.GL_POLYGON);
         for (float i = 0; i <= 50; i++) {
             theta = (float) (i / 50.0 * 2 * Math.PI);
-            z = 0;
+            x = (float) (radius1 * Math.cos(theta));
+            y = (float) (radius1 * Math.sin(theta));
+            gl.glColor3f(rShade, gShade, bShade);
+            gl.glVertex3f(x, y, z);
+        }
+        gl.glEnd();
+
+        for (float i = 0; i <= 40; i++) {
+            gl.glBegin(GL2.GL_QUAD_STRIP);/* f1: front */
+            radius1 = radius2;
+            z += .01f;
+            shadeIncrement();
+            for (float j = 0; j <= 50; j++) {
+                theta = (float) (j / 50.0 * 2 * Math.PI);
+                x = (float) (radius1 * Math.cos(theta));
+                y = (float) (radius1 * Math.sin(theta));
+                gl.glColor3f(rShade, gShade, bShade);
+                gl.glVertex3f(x, y, z);
+
+                radius2 = radius1 + .002f;
+                x = (float) (radius2 * Math.cos(theta));
+                y = (float) (radius2 * Math.sin(theta));
+                gl.glVertex3f(x, y, z+.01f);
+            }
+            gl.glEnd();
+        }
+
+        for (float i = 0; i <= 20; i++) {
+            gl.glBegin(GL2.GL_QUAD_STRIP);/* f1: front */
+            radius1 = radius2;
+            z += .01f;
+            shadeIncrement();
+            for (float j = 0; j <= 50; j++) {
+                theta = (float) (j / 50.0 * 2 * Math.PI);
+                x = (float) (radius1 * Math.cos(theta));
+                y = (float) (radius1 * Math.sin(theta));
+                gl.glColor3f(rShade, gShade, bShade);
+                gl.glVertex3f(x, y, z);
+
+                x = (float) (radius2 * Math.cos(theta));
+                y = (float) (radius2 * Math.sin(theta));
+                gl.glVertex3f(x, y, z+.01f);
+            }
+            gl.glEnd();
+        }
+
+        for (float i = 0; i <= 40; i++) {
+            gl.glBegin(GL2.GL_QUAD_STRIP);/* f1: front */
+            radius1 = radius2;
+            z += .01f;
+            shadeIncrement();
+            for (float j = 0; j <= 50; j++) {
+                theta = (float) (j / 50.0 * 2 * Math.PI);
+                x = (float) (radius1 * Math.cos(theta));
+                y = (float) (radius1 * Math.sin(theta));
+                gl.glColor3f(rShade, gShade, bShade);
+                if(i > 37)
+                    gl.glColor3f(0.9f,0.1f,0.1f);
+                gl.glVertex3f(x, y, z);
+
+                radius2 = radius1 - .0035f;
+                x = (float) (radius2 * Math.cos(theta));
+                y = (float) (radius2 * Math.sin(theta));
+                gl.glVertex3f(x, y, z+.01f);
+            }
+            gl.glEnd();
+        }
+
+        for (float i = 0; i <= 4; i++) {
+            gl.glBegin(GL2.GL_QUAD_STRIP);/* f1: front */
+            radius1 = radius2;
+            z += .01f;
+            shadeIncrement();
+            for (float j = 0; j <= 50; j++) {
+                theta = (float) (j / 50.0 * 2 * Math.PI);
+                x = (float) (radius1 * Math.cos(theta));
+                y = (float) (radius1 * Math.sin(theta));
+                gl.glColor3f(rShade, gShade, bShade);
+                gl.glVertex3f(x, y, z);
+
+                x = (float) (radius2 * Math.cos(theta));
+                y = (float) (radius2 * Math.sin(theta));
+                gl.glVertex3f(x, y, z+.01f);
+            }
+            gl.glEnd();
+        }
+
+        for (float i = 0; i <= 10; i++) {
+            gl.glBegin(GL2.GL_QUAD_STRIP);/* f1: front */
+            radius1 = radius2;
+            z += .01f;
+            shadeIncrement();
+            for (float j = 0; j <= 50; j++) {
+                theta = (float) (j / 50.0 * 2 * Math.PI);
+                x = (float) (radius1 * Math.cos(theta));
+                y = (float) (radius1 * Math.sin(theta));
+                gl.glColor3f(rShade, gShade, bShade);
+                if(i < 3)
+                    gl.glColor3f(0.9f,0.1f,0.1f);
+                gl.glVertex3f(x, y, z);
+
+                radius2 = radius1 + .0025f;
+                x = (float) (radius2 * Math.cos(theta));
+                y = (float) (radius2 * Math.sin(theta));
+                gl.glVertex3f(x, y, z+.01f);
+            }
+            gl.glEnd();
+        }
+
+        for (float i = 0; i <= 10; i++) {
+            gl.glBegin(GL2.GL_QUAD_STRIP);/* f1: front */
+            radius1 = radius2;
+            z += .01f;
+            shadeIncrement();
+            for (float j = 0; j <= 50; j++) {
+                theta = (float) (j / 50.0 * 2 * Math.PI);
+                x = (float) (radius1 * Math.cos(theta));
+                y = (float) (radius1 * Math.sin(theta));
+                gl.glColor3f(rShade, gShade, bShade);
+                gl.glVertex3f(x, y, z);
+
+                radius2 = radius1 - .002f;
+                x = (float) (radius2 * Math.cos(theta));
+                y = (float) (radius2 * Math.sin(theta));
+                gl.glVertex3f(x, y, z+.01f);
+            }
+            gl.glEnd();
+        }
+
+        for (float i = 0; i <= 8; i++) {
+            gl.glBegin(GL2.GL_QUAD_STRIP);/* f1: front */
+            radius1 = radius2;
+            z += .005f;
+            shadeIncrement();
+            for (float j = 0; j <= 50; j++) {
+                theta = (float) (j / 50.0 * 2 * Math.PI);
+                x = (float) (radius1 * Math.cos(theta));
+                y = (float) (radius1 * Math.sin(theta));
+                gl.glColor3f(rShade, gShade, bShade);
+                gl.glVertex3f(x, y, z);
+
+                radius2 = radius1 - .005f;
+                x = (float) (radius2 * Math.cos(theta));
+                y = (float) (radius2 * Math.sin(theta));
+                gl.glVertex3f(x, y, z+.01f);
+            }
+            gl.glEnd();
+        }
+
+        for (float i = 0; i <= 7; i++) {
+            gl.glBegin(GL2.GL_QUAD_STRIP);/* f1: front */
+            radius1 = radius2;
+            z += .002f;
+            shadeIncrement();
+            for (float j = 0; j <= 50; j++) {
+                theta = (float) (j / 50.0 * 2 * Math.PI);
+                x = (float) (radius1 * Math.cos(theta));
+                y = (float) (radius1 * Math.sin(theta));
+                gl.glColor3f(rShade, gShade, bShade);
+                gl.glVertex3f(x, y, z);
+
+                radius2 = radius1 - .002f;
+                x = (float) (radius2 * Math.cos(theta));
+                y = (float) (radius2 * Math.sin(theta));
+                gl.glVertex3f(x, y, z+.01f);
+            }
+            gl.glEnd();
+        }
+
+        for (float i = 0; i <= 7; i++) {
+            gl.glBegin(GL2.GL_QUAD_STRIP);/* f1: front */
+            radius1 = radius2;
+            z += .001f;
+            shadeIncrement();
+            for (float j = 0; j <= 50; j++) {
+                theta = (float) (j / 50.0 * 2 * Math.PI);
+                x = (float) (radius1 * Math.cos(theta));
+                y = (float) (radius1 * Math.sin(theta));
+                gl.glColor3f(rShade, gShade, bShade);
+                gl.glVertex3f(x, y, z);
+
+                radius2 = radius1 - .0005f;
+                x = (float) (radius2 * Math.cos(theta));
+                y = (float) (radius2 * Math.sin(theta));
+                gl.glVertex3f(x, y, z+.01f);
+            }
+            gl.glEnd();
+        }
+
+        gl.glColor3f(rShade, gShade, bShade);
+        for (float i = 0; i <= 50; i++) {
+            theta = (float) (i / 50.0 * 2 * Math.PI);
             x = (float) (radius1 * Math.cos(theta));
             y = (float) (radius1 * Math.sin(theta));
             gl.glVertex3f(x, y, z);
         }
         gl.glEnd();
-        */
-        gl.glBegin(GL2.GL_QUAD_STRIP);/* f1: front */
-        for (float i = 0; i <= 100; i++) {
-            for (float j = 0; j <= 50; j++) {
-                theta = (float) (j / 50.0 * 2 * Math.PI);
-                z = 0;
-                x = (float) (radius1 * Math.cos(theta));
-                y = (float) (radius1 * Math.sin(theta));
-                gl.glColor3f(0.1f, 0.3f, 0.4f);
-                if(i > 50)
-                    gl.glColor3f(0f, 1, 0.5f);
-                gl.glVertex3f(x, y, z);
-                z += 1.4;
 
-                x = (float) (radius2 * Math.cos(theta));
-                y = (float) (radius2 * Math.sin(theta));
-                gl.glColor3f(0, 0.5f, 0);
-                if(i > 50)
-                    gl.glColor3f(0f, 1, 0.5f);
-                gl.glVertex3f(x, y, z);
-            }
-            radius1 += 0.5f;
-            radius2 += 0.5f;
-        }
-        gl.glEnd();
         gl.glEndList();
+    }
+
+    private void shadeIncrement()
+    {
+        rShade += .007f;
+        gShade += .007f;
+        bShade += .007f;
     }
 
     private void render(GL2 gl, int width, int height) {
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         gl.glPushMatrix();
+        gl.glTranslatef(0,-1,0);
+        gl.glRotatef(-90,1,0,0);
+        gl.glCallList(pin_list);
+        gl.glTranslatef(1,0,0);
+        gl.glCallList(pin_list);
+        gl.glTranslatef(1,0,0);
+        gl.glCallList(pin_list);
+        gl.glTranslatef(-1.33f,-1,0);
+        gl.glCallList(pin_list);
+        gl.glTranslatef(0.67f,0,0);
         gl.glCallList(pin_list);
         gl.glPopMatrix();
     }
@@ -133,6 +319,14 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener {
                 break;
             case KeyEvent.VK_MINUS:
                 z += UNIT;
+                break;
+            case KeyEvent.VK_1:
+                z += UNIT;
+                refz += UNIT;
+                break;
+            case KeyEvent.VK_2:
+                z -= UNIT;
+                refz -= UNIT;
                 break;
             case KeyEvent.VK_R:
                 setDefault();
