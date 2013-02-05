@@ -6,7 +6,7 @@
     <ignored path=".idea/workspace.xml" />
     <file path="/Renderer.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1359503550303" ignored="false" />
     <file path="/fragment.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1359501503431" ignored="false" />
-    <file path="/Bowling.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1360097492849" ignored="false" />
+    <file path="/Bowling.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1360102172391" ignored="false" />
     <file path="/BowlingAWT.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1359667381130" ignored="false" />
     <file path="/Bowling2.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1359672846068" ignored="false" />
     <file path="/Driver.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1359669984709" ignored="false" />
@@ -76,7 +76,7 @@
       <file leaf-file-name="Bowling.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Bowling.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="14" column="66" selection-start="515" selection-end="2328" vertical-scroll-proportion="0.71903324">
+            <state line="103" column="85" selection-start="3761" selection-end="3761" vertical-scroll-proportion="0.9020173">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -121,10 +121,10 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="62" />
-    <option name="y" value="145" />
-    <option name="width" value="1304" />
-    <option name="height" value="768" />
+    <option name="x" value="54" />
+    <option name="y" value="-8" />
+    <option name="width" value="1320" />
+    <option name="height" value="784" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
@@ -376,11 +376,11 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="62" y="145" width="1304" height="768" extended-state="0" />
+    <frame x="54" y="-8" width="1320" height="784" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33252817" sideWeight="0.64648116" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3282989" sideWeight="0.6555024" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2527822" sideWeight="0.65466446" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39872408" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -393,7 +393,7 @@
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.399841" sideWeight="0.6634769" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.5643879" sideWeight="0.6555024" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3535188" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.34449762" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -577,7 +577,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Bowling.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="14" column="66" selection-start="515" selection-end="2328" vertical-scroll-proportion="0.71903324">
+        <state line="103" column="85" selection-start="3761" selection-end="3761" vertical-scroll-proportion="0.9020173">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

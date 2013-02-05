@@ -11,7 +11,7 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
     final static float SCROLL_SPEED = 0.1F;
     final static float MOUSE_SPEED = .003F;
 
-    int pin_list, floor_list;
+    int pin_list, floor_list, gutter_list;
     GLU glu;
     float eyeZ, eyeX, eyeY, refZ, refX, refY, upZ, upX, upY;
     float rShade, gShade, bShade;
@@ -45,19 +45,42 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
         floor_list = gl.glGenLists(1);
         gl.glNewList(floor_list, GL2.GL_COMPILE);
         gl.glBegin(GL2.GL_QUADS);
-        gl.glColor3f(.6f, .2f, .2f);
-        gl.glVertex3f(-2, -10, 0);
-        gl.glVertex3f(2, -10, 0);
-        gl.glVertex3f(2, 10, 0);
-        gl.glVertex3f(-2, 10, 0);
+        gl.glColor3f(.8f, .7f, .5f);
+        gl.glVertex3f(-1.3f, 0, -10);
+        gl.glVertex3f(1.3f, 0, -10);
+        gl.glVertex3f(1.3f, 0, 10);
+        gl.glVertex3f(-1.3f, 0, 10);
         gl.glEnd();
         gl.glEndList();
     }
+    private void createGutterList(GL2 gl) {
+        float theta;
+        radius1 = .25f;
+        gutter_list = gl.glGenLists(1);
+        gl.glNewList(gutter_list, GL2.GL_COMPILE);
+        gl.glBegin(GL2.GL_QUAD_STRIP);
+        for(int i = 0; i <= 50; i++)
+        {
+            theta = (float) (-i / 50.0 * Math.PI);
+            x = (float) (radius1 * Math.cos(theta));
+            y = (float) (radius1 * Math.sin(theta));
+            gl.glColor3f(.5f, .5f, .5f);
+            gl.glVertex3f(x, y, z-10);
 
+            x = (float) (radius1 * Math.cos(theta));
+            y = (float) (radius1 * Math.sin(theta));
+            gl.glVertex3f(x, y, z+10);
+        }
+        gl.glEnd();
+        gl.glEndList();
+    }
     private void createPinList(GL2 gl) {
         radius1 = 0.15f;
         radius2 = 0.15f;
         z = 0;
+        rShade = .2f;
+        gShade = .2f;
+        bShade = .2f;
 
         pin_list = gl.glGenLists(1);
         gl.glNewList(pin_list, GL2.GL_COMPILE);
@@ -83,7 +106,7 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
                              boolean overrideShade, float rColor, float gColor, float bColor)
     {
         float theta;
-        for (float i = 0; i <= length; i++) {
+        for (int i = 0; i <= length; i++) {
             gl.glBegin(connection);
             radius1 = radius2;
             z += zScale;
@@ -121,17 +144,22 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
 
     private void shadeIncrement()
     {
-        rShade += .007f;
-        gShade += .007f;
-        bShade += .007f;
+        rShade += .005f;
+        gShade += .005f;
+        bShade += .005f;
     }
 
     private void render(GL2 gl, int width, int height) {
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         gl.glPushMatrix();
-        gl.glRotatef(-90,1,0,0);
+        gl.glCallList(gutter_list);
+        gl.glTranslatef(1.55f,0,0);
         gl.glCallList(floor_list);
-        gl.glTranslatef(-1,0,0);
+        gl.glTranslatef(1.55f,0,0);
+        gl.glCallList(gutter_list);
+        gl.glTranslatef(-1.55f,0,0);
+        gl.glRotatef(-90,1,0,0);
+        gl.glTranslatef(-1,9.5f,0);
         gl.glCallList(pin_list); //7
         gl.glTranslatef(.67f,0,0);
         gl.glCallList(pin_list); //8
@@ -227,6 +255,7 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
         gl.glDepthFunc(GL.GL_LEQUAL);
 
         createFloorList(gl);
+        createGutterList(gl);
         createPinList(gl);
     }
 
