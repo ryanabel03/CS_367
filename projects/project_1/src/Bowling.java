@@ -11,10 +11,12 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
     final static float SCROLL_SPEED = 0.1F;
     final static float MOUSE_SPEED = .003F;
 
-    int pin_list;
+    int pin_list, floor_list;
     GLU glu;
     float eyeZ, eyeX, eyeY, refZ, refX, refY, upZ, upX, upY;
     float rShade, gShade, bShade;
+
+    float radius1, radius2, x, y, z;
 
     public Bowling(GLCapabilities capabilities) {
         super(capabilities);
@@ -39,217 +41,82 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
         upY = 1;
     }
 
+    private void createFloorList(GL2 gl) {
+        floor_list = gl.glGenLists(1);
+        gl.glNewList(floor_list, GL2.GL_COMPILE);
+        gl.glBegin(GL2.GL_QUADS);
+        gl.glColor3f(.6f, .2f, .2f);
+        gl.glVertex3f(-2, -10, 0);
+        gl.glVertex3f(2, -10, 0);
+        gl.glVertex3f(2, 10, 0);
+        gl.glVertex3f(-2, 10, 0);
+        gl.glEnd();
+        gl.glEndList();
+    }
+
     private void createPinList(GL2 gl) {
-        float theta, radius1, radius2, x, y, z;
         radius1 = 0.15f;
         radius2 = 0.15f;
         z = 0;
 
         pin_list = gl.glGenLists(1);
         gl.glNewList(pin_list, GL2.GL_COMPILE);
-        gl.glBegin(GL2.GL_POLYGON);
-        for (float i = 0; i <= 50; i++) {
-            theta = (float) (i / 50.0 * 2 * Math.PI);
-            x = (float) (radius1 * Math.cos(theta));
-            y = (float) (radius1 * Math.sin(theta));
-            gl.glColor3f(rShade, gShade, bShade);
-            gl.glVertex3f(x, y, z);
-        }
-        gl.glEnd();
+        genCylinder(gl, GL2.GL_POLYGON, 1, 0, 0, false, rShade, gShade, bShade);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 40, .01f, .002f, false, rShade, gShade, bShade);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 20, .01f, 0f, false, rShade, gShade, bShade);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 37, .01f, -.0035f, false, rShade, gShade, bShade);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 3, .01f, -.0035f, true, .9f, .1f, .1f);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 4, .01f, 0f, false, rShade, gShade, bShade);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 3, .01f, .0025f, true, .9f, .1f, .1f);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 7, .01f, .0025f, false, rShade, gShade, bShade);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 10, .01f, -.002f, false, rShade, gShade, bShade);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 8, .005f, -.005f, false, rShade, gShade, bShade);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 7, .002f, -.002f, false, rShade, gShade, bShade);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 7, .001f, -.0005f, false, rShade, gShade, bShade);
+        genCylinder(gl, GL2.GL_TRIANGLE_FAN, 1, 0, 0, false, rShade, gShade, bShade);
 
-        for (float i = 0; i <= 40; i++) {
-            gl.glBegin(GL2.GL_QUAD_STRIP);/* f1: front */
-            radius1 = radius2;
-            z += .01f;
-            shadeIncrement();
-            for (float j = 0; j <= 50; j++) {
-                theta = (float) (j / 50.0 * 2 * Math.PI);
-                x = (float) (radius1 * Math.cos(theta));
-                y = (float) (radius1 * Math.sin(theta));
-                gl.glColor3f(rShade, gShade, bShade);
-                gl.glVertex3f(x, y, z);
-
-                radius2 = radius1 + .002f;
-                x = (float) (radius2 * Math.cos(theta));
-                y = (float) (radius2 * Math.sin(theta));
-                gl.glVertex3f(x, y, z+.01f);
-            }
-            gl.glEnd();
-        }
-
-        for (float i = 0; i <= 20; i++) {
-            gl.glBegin(GL2.GL_QUAD_STRIP);/* f1: front */
-            radius1 = radius2;
-            z += .01f;
-            shadeIncrement();
-            for (float j = 0; j <= 50; j++) {
-                theta = (float) (j / 50.0 * 2 * Math.PI);
-                x = (float) (radius1 * Math.cos(theta));
-                y = (float) (radius1 * Math.sin(theta));
-                gl.glColor3f(rShade, gShade, bShade);
-                gl.glVertex3f(x, y, z);
-
-                x = (float) (radius2 * Math.cos(theta));
-                y = (float) (radius2 * Math.sin(theta));
-                gl.glVertex3f(x, y, z+.01f);
-            }
-            gl.glEnd();
-        }
-
-        for (float i = 0; i <= 40; i++) {
-            gl.glBegin(GL2.GL_QUAD_STRIP);/* f1: front */
-            radius1 = radius2;
-            z += .01f;
-            shadeIncrement();
-            for (float j = 0; j <= 50; j++) {
-                theta = (float) (j / 50.0 * 2 * Math.PI);
-                x = (float) (radius1 * Math.cos(theta));
-                y = (float) (radius1 * Math.sin(theta));
-                gl.glColor3f(rShade, gShade, bShade);
-                if(i > 37)
-                    gl.glColor3f(0.9f,0.1f,0.1f);
-                gl.glVertex3f(x, y, z);
-
-                radius2 = radius1 - .0035f;
-                x = (float) (radius2 * Math.cos(theta));
-                y = (float) (radius2 * Math.sin(theta));
-                gl.glVertex3f(x, y, z+.01f);
-            }
-            gl.glEnd();
-        }
-
-        for (float i = 0; i <= 4; i++) {
-            gl.glBegin(GL2.GL_QUAD_STRIP);/* f1: front */
-            radius1 = radius2;
-            z += .01f;
-            shadeIncrement();
-            for (float j = 0; j <= 50; j++) {
-                theta = (float) (j / 50.0 * 2 * Math.PI);
-                x = (float) (radius1 * Math.cos(theta));
-                y = (float) (radius1 * Math.sin(theta));
-                gl.glColor3f(rShade, gShade, bShade);
-                gl.glVertex3f(x, y, z);
-
-                x = (float) (radius2 * Math.cos(theta));
-                y = (float) (radius2 * Math.sin(theta));
-                gl.glVertex3f(x, y, z+.01f);
-            }
-            gl.glEnd();
-        }
-
-        for (float i = 0; i <= 10; i++) {
-            gl.glBegin(GL2.GL_QUAD_STRIP);/* f1: front */
-            radius1 = radius2;
-            z += .01f;
-            shadeIncrement();
-            for (float j = 0; j <= 50; j++) {
-                theta = (float) (j / 50.0 * 2 * Math.PI);
-                x = (float) (radius1 * Math.cos(theta));
-                y = (float) (radius1 * Math.sin(theta));
-                gl.glColor3f(rShade, gShade, bShade);
-                if(i < 3)
-                    gl.glColor3f(0.9f,0.1f,0.1f);
-                gl.glVertex3f(x, y, z);
-
-                radius2 = radius1 + .0025f;
-                x = (float) (radius2 * Math.cos(theta));
-                y = (float) (radius2 * Math.sin(theta));
-                gl.glVertex3f(x, y, z+.01f);
-            }
-            gl.glEnd();
-        }
-
-        for (float i = 0; i <= 10; i++) {
-            gl.glBegin(GL2.GL_QUAD_STRIP);/* f1: front */
-            radius1 = radius2;
-            z += .01f;
-            shadeIncrement();
-            for (float j = 0; j <= 50; j++) {
-                theta = (float) (j / 50.0 * 2 * Math.PI);
-                x = (float) (radius1 * Math.cos(theta));
-                y = (float) (radius1 * Math.sin(theta));
-                gl.glColor3f(rShade, gShade, bShade);
-                gl.glVertex3f(x, y, z);
-
-                radius2 = radius1 - .002f;
-                x = (float) (radius2 * Math.cos(theta));
-                y = (float) (radius2 * Math.sin(theta));
-                gl.glVertex3f(x, y, z+.01f);
-            }
-            gl.glEnd();
-        }
-
-        for (float i = 0; i <= 8; i++) {
-            gl.glBegin(GL2.GL_QUAD_STRIP);/* f1: front */
-            radius1 = radius2;
-            z += .005f;
-            shadeIncrement();
-            for (float j = 0; j <= 50; j++) {
-                theta = (float) (j / 50.0 * 2 * Math.PI);
-                x = (float) (radius1 * Math.cos(theta));
-                y = (float) (radius1 * Math.sin(theta));
-                gl.glColor3f(rShade, gShade, bShade);
-                gl.glVertex3f(x, y, z);
-
-                radius2 = radius1 - .005f;
-                x = (float) (radius2 * Math.cos(theta));
-                y = (float) (radius2 * Math.sin(theta));
-                gl.glVertex3f(x, y, z+.01f);
-            }
-            gl.glEnd();
-        }
-
-        for (float i = 0; i <= 7; i++) {
-            gl.glBegin(GL2.GL_QUAD_STRIP);/* f1: front */
-            radius1 = radius2;
-            z += .002f;
-            shadeIncrement();
-            for (float j = 0; j <= 50; j++) {
-                theta = (float) (j / 50.0 * 2 * Math.PI);
-                x = (float) (radius1 * Math.cos(theta));
-                y = (float) (radius1 * Math.sin(theta));
-                gl.glColor3f(rShade, gShade, bShade);
-                gl.glVertex3f(x, y, z);
-
-                radius2 = radius1 - .002f;
-                x = (float) (radius2 * Math.cos(theta));
-                y = (float) (radius2 * Math.sin(theta));
-                gl.glVertex3f(x, y, z+.01f);
-            }
-            gl.glEnd();
-        }
-
-        for (float i = 0; i <= 7; i++) {
-            gl.glBegin(GL2.GL_QUAD_STRIP);/* f1: front */
-            radius1 = radius2;
-            z += .001f;
-            shadeIncrement();
-            for (float j = 0; j <= 50; j++) {
-                theta = (float) (j / 50.0 * 2 * Math.PI);
-                x = (float) (radius1 * Math.cos(theta));
-                y = (float) (radius1 * Math.sin(theta));
-                gl.glColor3f(rShade, gShade, bShade);
-                gl.glVertex3f(x, y, z);
-
-                radius2 = radius1 - .0005f;
-                x = (float) (radius2 * Math.cos(theta));
-                y = (float) (radius2 * Math.sin(theta));
-                gl.glVertex3f(x, y, z+.01f);
-            }
-            gl.glEnd();
-        }
-
-        for (float i = 0; i <= 50; i++) {
-            gl.glBegin(GL2.GL_TRIANGLE_FAN);/* f1: front */
-            theta = (float) (i / 50.0 * 2 * Math.PI);
-            x = (float) (radius1 * Math.cos(theta));
-            y = (float) (radius1 * Math.sin(theta));
-            gl.glColor3f(rShade, gShade, bShade);
-            gl.glVertex3f(x, y, z);
-        }
-        gl.glEnd();
-
+        setDrawSettings(0.15f, 0.15f, 0, 0, 0);
         gl.glEndList();
+    }
+
+    private void genCylinder(GL2 gl, int connection, float length, float zScale, float radiusScale,
+                             boolean overrideShade, float rColor, float gColor, float bColor)
+    {
+        float theta;
+        for (float i = 0; i <= length; i++) {
+            gl.glBegin(connection);
+            radius1 = radius2;
+            z += zScale;
+            shadeIncrement();
+            if(!overrideShade)
+            {
+                rColor = rShade;
+                gColor = gShade;
+                bColor = bShade;
+            }
+            for (float j = 0; j <= 50; j++) {
+                theta = (float) (j / 50.0 * 2 * Math.PI);
+                x = (float) (radius1 * Math.cos(theta));
+                y = (float) (radius1 * Math.sin(theta));
+                gl.glColor3f(rColor, gColor, bColor);
+                gl.glVertex3f(x, y, z);
+
+                radius2 = radius1 + radiusScale;
+                x = (float) (radius2 * Math.cos(theta));
+                y = (float) (radius2 * Math.sin(theta));
+                gl.glVertex3f(x, y, z+.01f);
+            }
+            gl.glEnd();
+        }
+    }
+
+    private void setDrawSettings(float rad1, float rad2, float newX, float newY, float newZ)
+    {
+        radius1 = rad1;
+        radius2 = rad2;
+        x = newX;
+        y = newY;
+        z = newZ;
     }
 
     private void shadeIncrement()
@@ -262,8 +129,9 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
     private void render(GL2 gl, int width, int height) {
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         gl.glPushMatrix();
-        gl.glTranslatef(0,-1,0);
         gl.glRotatef(-90,1,0,0);
+        gl.glCallList(floor_list);
+        gl.glTranslatef(-1,0,0);
         gl.glCallList(pin_list); //7
         gl.glTranslatef(.67f,0,0);
         gl.glCallList(pin_list); //8
@@ -358,6 +226,7 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
         gl.glEnable(GL.GL_DEPTH_TEST);
         gl.glDepthFunc(GL.GL_LEQUAL);
 
+        createFloorList(gl);
         createPinList(gl);
     }
 
