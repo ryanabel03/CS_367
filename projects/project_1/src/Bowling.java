@@ -11,7 +11,7 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
     final static float SCROLL_SPEED = 0.1F;
     final static float MOUSE_SPEED = .003F;
 
-    int pin_list, floor_list, gutter_list;
+    int pin_list, floor_list, gutter_list, ball_list;
     GLU glu;
     float eyeZ, eyeX, eyeY, refZ, refX, refY, upZ, upX, upY;
     float rShade, gShade, bShade;
@@ -102,6 +102,32 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
         gl.glEndList();
     }
 
+    private void createBallList(GL2 gl) {
+        setDrawSettings(.1f, .1f, x, y, z);
+        resetShading();
+        ball_list = gl.glGenLists(1);
+        gl.glNewList(ball_list, GL2.GL_COMPILE);
+        float size = .005f;
+        for(int i = 0; i < 10; i++) {
+            size = size - .0005f;
+            genCylinder(gl, GL2.GL_QUAD_STRIP, 20, .0023f, size, false, rShade, gShade, bShade);
+        }
+
+        for(int i = 0; i < 10; i++) {
+            size = size + .0005f;
+            genCylinder(gl, GL2.GL_QUAD_STRIP, 20, .0023f, -size, true, rShade, gShade, bShade);
+        }
+
+        gl.glEndList();
+
+    }
+
+    private void resetShading() {
+        rShade = 0;
+        gShade = 0;
+        bShade = 0;
+    }
+
     private void genCylinder(GL2 gl, int connection, float length, float zScale, float radiusScale,
                              boolean overrideShade, float rColor, float gColor, float bColor)
     {
@@ -160,25 +186,29 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
         gl.glTranslatef(-1.55f,0,0);
         gl.glRotatef(-90,1,0,0);
         gl.glTranslatef(-1,9.5f,0);
+        gl.glTranslatef(0, -1, 0);
+        gl.glTranslatef(-1, 0, 0);
         gl.glCallList(pin_list); //7
-        gl.glTranslatef(.67f,0,0);
+        gl.glTranslatef(.67f, 0, 0);
         gl.glCallList(pin_list); //8
-        gl.glTranslatef(.67f,0,0);
+        gl.glTranslatef(.67f, 0, 0);
         gl.glCallList(pin_list); //9
-        gl.glTranslatef(.67f,0,0);
+        gl.glTranslatef(.67f, 0, 0);
         gl.glCallList(pin_list); //10
-        gl.glTranslatef(-1.67f,-.5f,0);
+        gl.glTranslatef(-1.67f, -.5f, 0);
         gl.glCallList(pin_list); //4
-        gl.glTranslatef(.67f,0,0);
+        gl.glTranslatef(.67f, 0, 0);
         gl.glCallList(pin_list); //5
-        gl.glTranslatef(.67f,0,0);
+        gl.glTranslatef(.67f, 0, 0);
         gl.glCallList(pin_list); //6
-        gl.glTranslatef(-1,-.5f,0);
+        gl.glTranslatef(-1, -.5f, 0);
         gl.glCallList(pin_list); //2
-        gl.glTranslatef(.67f,0,0);
+        gl.glTranslatef(.67f, 0, 0);
         gl.glCallList(pin_list); //3
-        gl.glTranslatef(-.33f,-.5f,0);
+        gl.glTranslatef(-.33f, -.5f, 0);
         gl.glCallList(pin_list); //1
+        gl.glTranslatef(0, -6f, 0);
+        gl.glCallList(ball_list);
         gl.glPopMatrix();
     }
 
@@ -257,6 +287,7 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
         createFloorList(gl);
         createGutterList(gl);
         createPinList(gl);
+        createBallList(gl);
     }
 
     public void dispose(GLAutoDrawable glAutoDrawable) {
