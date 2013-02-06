@@ -27,12 +27,14 @@ enum MenuEntries {
 GLint viewport[4];
 GLdouble mvMatrix[16];
 GLdouble prMatrix[16];
+GLdouble potCoordFrame[16];  /* teapot coordinate frame */
 vector<Pos2D> vertices;
 map<MenuEntries,unsigned int> menuMap;
 
 float bgColor[3];
 int potlist, cf_list, arrow_list; /* teapot and coordinate frame */
 
+void printMatrix(double[]);
 /********************************************************************/
 // Display callback
 /********************************************************************/
@@ -42,15 +44,21 @@ void render(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     showHelp();
-    glCallList(cf_list);
-    glCallList(potlist);
 
+    glCallList(cf_list);
+    glPushMatrix();
+    /* transform the teapot using its own frame */
+    // glLoadMatrixd(potCoordinateFrame); <== WRONG function used in class
+    glMultMatrixd(potCoordFrame);
+    glCallList(potlist);
+    glPopMatrix();
+    
 	glutSwapBuffers();
 }
 
 void printMatrix (double mat[])
 {
-    printf ("Coordinae Frame:\n");
+    printf ("Coordinate Frame:\n");
     for (int k = 0; k < 4; k++)
     {
         for (int m = 0; m < 4; m++)
@@ -145,9 +153,20 @@ void fkeyHandler (int key, int x, int y)
     else {
         switch (key) {
             case GLUT_KEY_UP:
+                /* multiply the teapot frame with X-translate */
+                glPushMatrix();
+                glLoadMatrixd(potCoordFrame);                     /* C = potCF              */
+                glTranslated(0.5, 0, 0);                          /* C = pot_CF * Translate */
+                glGetDoublev(GL_MODELVIEW_MATRIX, potCoordFrame); /* potCF = C */
+                glPopMatrix();
                 cout << "Up" << endl;
                 break;
             case GLUT_KEY_DOWN:
+                glPushMatrix();
+                glLoadMatrixd(potCoordFrame);                     /* C = potCF              */
+                glTranslated(-0.5, 0, 0);                         /* C = pot_CF * Translate */
+                glGetDoublev(GL_MODELVIEW_MATRIX, potCoordFrame); /* potCF = C */
+                glPopMatrix();
                 cout << "Down" << endl;
                 break;
             case GLUT_KEY_LEFT:
@@ -201,12 +220,7 @@ void initStates()
 {
     static float lightpos[] = {1, 4, 0, 1};
 
-    /* Setup the teapot */
-    potlist = glGenLists(1);
-    glNewList(potlist, GL_COMPILE);
-    glColor3ub(170, 295, 92);
-    glutSolidTeapot(1.0);
-    glEndList();
+
 
     /* setup the axes */
     arrow_list = glGenLists(1);
@@ -244,11 +258,25 @@ void initStates()
     glPopMatrix();
     glEndList();
 
+    /* Setup the teapot */
+    potlist = glGenLists(1);
+    glNewList(potlist, GL_COMPILE);
+    glCallList(cf_list);
+
+    glColor3ub(170, 195, 92);
+    glutSolidTeapot(1.0);
+    glEndList();
     fill (bgColor, bgColor + 3, 0.0);
     glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.0);
 
     glLineWidth(2.0);
     glPointSize(3.0);
+
+    /* use glLoadIdentity to initialize my teapot CF */
+    glPushMatrix();
+    glLoadIdentity();                                   /* C = I     */
+    glGetDoublev(GL_MODELVIEW_MATRIX, potCoordFrame);   /* potCF = C */
+    glPopMatrix();
 
     
     /* render front polygons (CCW) as filled faces */
