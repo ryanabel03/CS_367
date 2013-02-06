@@ -1,0 +1,52 @@
+Most of the examples are configured using cmake (downloadable from
+cmake.org). Cmake can generate Makefile/project files for many different
+IDEs/platforms:
+- Unix Makefile
+- Codeblock
+- Eclipse
+- KDevelop
+- Xcode
+- Eclipse
+- [and much more]
+
+Additional tools needed to compile:
+1) GLUT header files, downloadable from 
+   http://user.xmission.com/~nate/glut.html
+2) C++ compiler: g++ or Visual C++ Express
+
+On Linux, use the freeglut3-dev package.
+On Windows, follow the instruction found at one of the following sites:
+     http://user.xmission.com/~nate/glut.html
+     http://www.opengl.org/resources/libraries/glut/
+
+INSTRUCTIONS
+============
+The following commands must be entered after you chdir to each of the
+example subdirectory so that the "build" subdirectory is created as a
+sibling to the "src" subdirectory.
+
+To compile using command-line make (Linux/MacOS X)
+(1) mkdir build
+(2) cd build
+(3) cmake ../src    # to generate Unix Makefile
+(4) make
+
+To compile using Eclipse (Linux/MacOS X)
+(1) mkdir build
+(2) cd build
+(3) cmake -G"Eclipse CDT4 - Unix Makefile" ../src  # generate an Eclipse project
+(4) Use Eclipse to import the project under the build subdirectory
+
+To compile using Xcode (MacOS X)
+(1) mkdir build
+(2) cd build
+(3) cmake -GXcode ../src
+(4) Open the Xcode project file generated in the build subdirectory
+    Under the "Product" menu, Select "Manage Schemes" and disable the
+    "ALL_BUILD" and "ZERO_CHECK" targets
+
+To compile on Windows (Visual Studio)
+(1) mkdir build
+(2) cd build
+(3) cmake ../src
+(4) Open the generated VS project

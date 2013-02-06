@@ -94,6 +94,30 @@ void render(void)
 	glutSwapBuffers();
 }
 
+void printMatrix ()
+{
+    float mat[16];
+    glGetFloatv(GL_PROJECTION_MATRIX, mat);
+    printf ("Projection Matrix\n");
+    for (int k = 0; k < 4; k++)
+    {
+        for (int m = 0; m < 4; m++)
+        {
+            printf ("%2.3f ", mat[m*4+k]);
+        }
+        printf("\n");
+    }
+    glGetFloatv(GL_MODELVIEW_MATRIX, mat);
+    printf ("ModelView Matrix\n");
+    for (int k = 0; k < 4; k++)
+    {
+        for (int m = 0; m < 4; m++)
+        {
+            printf ("%2.3f ", mat[m*4+k]);
+        }
+        printf("\n");
+    }
+}
 /********************************************************************/
 // Resize callback
 /********************************************************************/
@@ -120,14 +144,22 @@ void resize (int w, int h)
 #else
     gluPerspective(60, (float)w/h, 1, 10);
 #endif
+    
 	glGetDoublev(GL_PROJECTION_MATRIX, prMatrix);
     /* always switch back to MODEVLVIEW matrix mode !!!! */
 	glMatrixMode (GL_MODELVIEW);
 	glLoadIdentity();
+    /* glLoadIdentity(): use the default camera placement: eye at origin,
+       the camera is viewing along the NEGATIVE z-axis, 
+       and the camera Y-axis (its "up" axis) is parallel to the world Y-axis
+     */
+    printMatrix();
 #if 1
+    /* gluLookAt: move the eye to (0, 0, 5) */
     gluLookAt(0, 0, 5.0, 0, 0, 0, 0, 1, 0);
 #endif
 	glGetDoublev(GL_MODELVIEW_MATRIX, mvMatrix);
+    printMatrix();
 }
 
 #if 0
@@ -247,6 +279,7 @@ void primitiveSelector (int select)
     current_primitive = (MenuEntries)select;
     glutPostRedisplay(); /* request display refresh */
 }
+
 
 /********************************************************************/
 // Initialization routines

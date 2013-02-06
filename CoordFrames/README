@@ -1,0 +1,3 @@
+This example shows how to maintain a separate coordinate frame (4x4 matrix)
+for each 3D object. Using this CF, all transformations to an object can
+be implemented by multiplying the CF with a new transformation.
