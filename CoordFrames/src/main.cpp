@@ -129,24 +129,32 @@ void fkeyHandler (int key, int x, int y)
     if (mod == GLUT_ACTIVE_SHIFT) {
         switch (key) {
             case GLUT_KEY_UP:
+                cout << "Shift-Up" << endl;
                 break;
             case GLUT_KEY_DOWN:
+                cout << "Shift-Down" << endl;
                 break;
             case GLUT_KEY_LEFT:
+                cout << "Shift-Left" << endl;
                 break;
             case GLUT_KEY_RIGHT:
+                cout << "Shift-Right" << endl;
                 break;
         }
     }
     else {
         switch (key) {
             case GLUT_KEY_UP:
+                cout << "Up" << endl;
                 break;
             case GLUT_KEY_DOWN:
+                cout << "Down" << endl;
                 break;
             case GLUT_KEY_LEFT:
+                cout << "Left" << endl;
                 break;
             case GLUT_KEY_RIGHT:
+                cout << "Right" << endl;
                 break;
         }
 
@@ -171,13 +179,11 @@ void topMenuHandler (int select)
     glutPostRedisplay(); /* request display refresh */
 }
 
-void primitiveSelector (int select)
-{
-    glutPostRedisplay(); /* request display refresh */
-}
-
 void showText (int x, int y, string msg)
 {
+    /* color must be set BEFORE glWindowPos* !!!!! */
+    glColor3f(1,1,1); /* white text */
+    /* Use the window coordinates to place the text */
     glWindowPos2i(x, y);
     for (int k = 0; k < msg.length(); k++)
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, msg[k]);
@@ -231,7 +237,7 @@ void initStates()
     glPopMatrix();
 
     /* draw the z-axis in blue */
-    glColor3ub(0, 0, 255);
+    glColor3ub(18, 168, 212);
     glPushMatrix();
     glRotatef(-90, 0, 1, 0);
     glCallList(arrow_list);
