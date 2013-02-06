@@ -44,7 +44,7 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
     private void createFloorList(GL2 gl) {
         floor_list = gl.glGenLists(1);
         gl.glNewList(floor_list, GL2.GL_COMPILE);
-        genRectangle(gl,GL2.GL_QUADS,2.6f,20,.2f);
+        genRectangle(gl,GL2.GL_QUADS,2.6f,.2f,20);
         gl.glEndList();
     }
     private void createGutterList(GL2 gl) {
@@ -121,29 +121,42 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
         bShade = 0;
     }
 
-    private void genRectangle(GL2 gl, int connection, float length, float depth, float height)
+    private void genRectangle(GL2 gl, int connection, float length, float height, float depth)
     {
+        float halfLength = length/2;
+        float halfDepth = depth/2;
         gl.glBegin(connection);
         gl.glColor3f(.8f, .7f, .5f);
-        gl.glVertex3f(-length/2, 0, -depth/2);
-        gl.glVertex3f(length/2, 0, -depth/2);
-        gl.glVertex3f(length/2, 0, depth/2);
-        gl.glVertex3f(-length/2, 0, depth/2);
-
-        gl.glVertex3f(-length/2, -height, -depth/2);
-        gl.glVertex3f(length/2, -height, -depth/2);
-        gl.glVertex3f(length/2, -height, depth/2);
-        gl.glVertex3f(-length/2, -height, depth/2);
-
-        gl.glVertex3f(-length/2, 0, -depth/2);
-        gl.glVertex3f(length/2, 0, -depth/2);
-        gl.glVertex3f(length/2, -height, -depth/2);
-        gl.glVertex3f(-length/2, -height, -depth/2);
-
-        gl.glVertex3f(-length/2, 0, depth/2);
-        gl.glVertex3f(length/2, 0, depth/2);
-        gl.glVertex3f(length/2, -height, depth/2);
-        gl.glVertex3f(-length/2, -height, depth/2);
+        //bottom face
+        gl.glVertex3f(-halfLength,0,-halfDepth);
+        gl.glVertex3f(halfLength,0,-halfDepth);
+        gl.glVertex3f(halfLength,0,halfDepth);
+        gl.glVertex3f(-halfLength,0,halfDepth);
+        //top face
+        gl.glVertex3f(-halfLength,-height,-halfDepth);
+        gl.glVertex3f(halfLength,-height,-halfDepth);
+        gl.glVertex3f(halfLength,-height,halfDepth);
+        gl.glVertex3f(-halfLength,-height,halfDepth);
+        //front face
+        gl.glVertex3f(-halfLength,-height,halfDepth);
+        gl.glVertex3f(-halfLength,0,halfDepth);
+        gl.glVertex3f(halfLength,0,halfDepth);
+        gl.glVertex3f(halfLength,-height,halfDepth);
+        //back face
+        gl.glVertex3f(-halfLength,-height,-halfDepth);
+        gl.glVertex3f(-halfLength,0,-halfDepth);
+        gl.glVertex3f(halfLength,0,-halfDepth);
+        gl.glVertex3f(halfLength,-height,-halfDepth);
+        //left face
+        gl.glVertex3f(-halfLength,-height,halfDepth);
+        gl.glVertex3f(-halfLength,0,halfDepth);
+        gl.glVertex3f(-halfLength,0,-halfDepth);
+        gl.glVertex3f(-halfLength,-height,-halfDepth);
+        //right face
+        gl.glVertex3f(halfLength,-height,halfDepth);
+        gl.glVertex3f(halfLength,0,halfDepth);
+        gl.glVertex3f(halfLength,0,-halfDepth);
+        gl.glVertex3f(halfLength,-height,-halfDepth);
         gl.glEnd();
     }
 

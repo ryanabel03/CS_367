@@ -6,7 +6,7 @@
     <ignored path=".idea/workspace.xml" />
     <file path="/Renderer.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1359503550303" ignored="false" />
     <file path="/fragment.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1359501503431" ignored="false" />
-    <file path="/Bowling.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1360181939612" ignored="false" />
+    <file path="/Bowling.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1360183022607" ignored="false" />
     <file path="/BowlingAWT.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1359667381130" ignored="false" />
     <file path="/Bowling2.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1359672846068" ignored="false" />
     <file path="/Driver.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1359669984709" ignored="false" />
@@ -76,7 +76,7 @@
       <file leaf-file-name="Bowling.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Bowling.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="46" column="40" selection-start="1337" selection-end="1337" vertical-scroll-proportion="0.3360215">
+            <state line="124" column="93" selection-start="4529" selection-end="4529" vertical-scroll-proportion="0.5241935">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -573,7 +573,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Bowling.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="46" column="40" selection-start="1337" selection-end="1337" vertical-scroll-proportion="0.3360215">
+        <state line="124" column="93" selection-start="4529" selection-end="4529" vertical-scroll-proportion="0.5241935">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
