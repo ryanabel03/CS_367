@@ -6,7 +6,7 @@
     <ignored path=".idea/workspace.xml" />
     <file path="/Renderer.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1359503550303" ignored="false" />
     <file path="/fragment.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1359501503431" ignored="false" />
-    <file path="/Bowling.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1360102172391" ignored="false" />
+    <file path="/Bowling.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1360181939612" ignored="false" />
     <file path="/BowlingAWT.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1359667381130" ignored="false" />
     <file path="/Bowling2.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1359672846068" ignored="false" />
     <file path="/Driver.java" changelist="4c5affda-97e0-414a-a05e-cc6b07324324" time="1359669984709" ignored="false" />
@@ -29,7 +29,6 @@
     <disable_hints />
   </component>
   <component name="DebuggerManager">
-    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true">
       <breakpoint>
         <option name="NOTIFY_CAUGHT" value="true" />
@@ -64,6 +63,7 @@
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
     </breakpoint_any>
+    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_rules />
     <ui_properties />
   </component>
@@ -76,7 +76,7 @@
       <file leaf-file-name="Bowling.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Bowling.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="103" column="85" selection-start="3761" selection-end="3761" vertical-scroll-proportion="0.9020173">
+            <state line="46" column="40" selection-start="1337" selection-end="1337" vertical-scroll-proportion="0.3360215">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -88,9 +88,7 @@
         <entry file="file://$PROJECT_DIR$/src/Driver.java">
           <provider selected="true" editor-type-id="text-editor">
             <state line="8" column="136" selection-start="256" selection-end="256" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
@@ -206,9 +204,9 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="GoToClass.includeLibraries" value="false" />
-    <property name="options.splitter.details.proportions" value="0.2" />
-    <property name="options.searchVisible" value="true" />
     <property name="dynamic.classpath" value="false" />
+    <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
   </component>
   <component name="RunManager" selected="Application.Driver">
     <configuration default="false" name="Renderer" type="Application" factoryName="Application" temporary="true">
@@ -569,15 +567,13 @@
     <entry file="file://$PROJECT_DIR$/src/Driver.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="8" column="136" selection-start="256" selection-end="256" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Bowling.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="103" column="85" selection-start="3761" selection-end="3761" vertical-scroll-proportion="0.9020173">
+        <state line="46" column="40" selection-start="1337" selection-end="1337" vertical-scroll-proportion="0.3360215">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

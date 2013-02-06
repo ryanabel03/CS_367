@@ -44,18 +44,12 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
     private void createFloorList(GL2 gl) {
         floor_list = gl.glGenLists(1);
         gl.glNewList(floor_list, GL2.GL_COMPILE);
-        gl.glBegin(GL2.GL_QUADS);
-        gl.glColor3f(.8f, .7f, .5f);
-        gl.glVertex3f(-1.3f, 0, -10);
-        gl.glVertex3f(1.3f, 0, -10);
-        gl.glVertex3f(1.3f, 0, 10);
-        gl.glVertex3f(-1.3f, 0, 10);
-        gl.glEnd();
+        genRectangle(gl,GL2.GL_QUADS,2.6f,20,.2f);
         gl.glEndList();
     }
     private void createGutterList(GL2 gl) {
         float theta;
-        radius1 = .25f;
+        radius1 = .27f;
         gutter_list = gl.glGenLists(1);
         gl.glNewList(gutter_list, GL2.GL_COMPILE);
         gl.glBegin(GL2.GL_QUAD_STRIP);
@@ -65,11 +59,11 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
             x = (float) (radius1 * Math.cos(theta));
             y = (float) (radius1 * Math.sin(theta));
             gl.glColor3f(.5f, .5f, .5f);
-            gl.glVertex3f(x, y, z-10);
+            gl.glVertex3f(x, y*.7f, z-10);
 
             x = (float) (radius1 * Math.cos(theta));
             y = (float) (radius1 * Math.sin(theta));
-            gl.glVertex3f(x, y, z+10);
+            gl.glVertex3f(x, y*.7f, z+10);
         }
         gl.glEnd();
         gl.glEndList();
@@ -78,25 +72,23 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
         radius1 = 0.15f;
         radius2 = 0.15f;
         z = 0;
-        rShade = .2f;
-        gShade = .2f;
-        bShade = .2f;
+        setDrawBaseColor(.5f, .5f, .5f);
 
         pin_list = gl.glGenLists(1);
         gl.glNewList(pin_list, GL2.GL_COMPILE);
-        genCylinder(gl, GL2.GL_POLYGON, 1, 0, 0, false, rShade, gShade, bShade);
-        genCylinder(gl, GL2.GL_QUAD_STRIP, 40, .01f, .002f, false, rShade, gShade, bShade);
-        genCylinder(gl, GL2.GL_QUAD_STRIP, 20, .01f, 0f, false, rShade, gShade, bShade);
-        genCylinder(gl, GL2.GL_QUAD_STRIP, 37, .01f, -.0035f, false, rShade, gShade, bShade);
-        genCylinder(gl, GL2.GL_QUAD_STRIP, 3, .01f, -.0035f, true, .9f, .1f, .1f);
-        genCylinder(gl, GL2.GL_QUAD_STRIP, 4, .01f, 0f, false, rShade, gShade, bShade);
-        genCylinder(gl, GL2.GL_QUAD_STRIP, 3, .01f, .0025f, true, .9f, .1f, .1f);
-        genCylinder(gl, GL2.GL_QUAD_STRIP, 7, .01f, .0025f, false, rShade, gShade, bShade);
-        genCylinder(gl, GL2.GL_QUAD_STRIP, 10, .01f, -.002f, false, rShade, gShade, bShade);
-        genCylinder(gl, GL2.GL_QUAD_STRIP, 8, .005f, -.005f, false, rShade, gShade, bShade);
-        genCylinder(gl, GL2.GL_QUAD_STRIP, 7, .002f, -.002f, false, rShade, gShade, bShade);
-        genCylinder(gl, GL2.GL_QUAD_STRIP, 7, .001f, -.0005f, false, rShade, gShade, bShade);
-        genCylinder(gl, GL2.GL_TRIANGLE_FAN, 1, 0, 0, false, rShade, gShade, bShade);
+        genCylinder(gl, GL2.GL_POLYGON, 1, 0, 0, false, rShade, gShade, bShade, .005f);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 40, .01f, .002f, false, rShade, gShade, bShade, .005f);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 20, .01f, 0f, false, rShade, gShade, bShade, .005f);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 37, .01f, -.0035f, false, rShade, gShade, bShade, .005f);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 3, .01f, -.0035f, true, .9f, .1f, .1f, .005f);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 4, .01f, 0f, false, rShade, gShade, bShade, .005f);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 3, .01f, .0025f, true, .9f, .1f, .1f, .005f);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 7, .01f, .0025f, false, rShade, gShade, bShade, .005f);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 10, .01f, -.002f, false, rShade, gShade, bShade, .005f);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 8, .005f, -.005f, false, rShade, gShade, bShade, .005f);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 7, .002f, -.002f, false, rShade, gShade, bShade, .005f);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 7, .001f, -.0005f, false, rShade, gShade, bShade, .005f);
+        genCylinder(gl, GL2.GL_TRIANGLE_FAN, 1, 0, 0, false, rShade, gShade, bShade, .005f);
 
         setDrawSettings(0.15f, 0.15f, 0, 0, 0);
         gl.glEndList();
@@ -105,17 +97,18 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
     private void createBallList(GL2 gl) {
         setDrawSettings(.1f, .1f, x, y, z);
         resetShading();
+        setDrawBaseColor(0,0,.3f);
         ball_list = gl.glGenLists(1);
         gl.glNewList(ball_list, GL2.GL_COMPILE);
         float size = .005f;
         for(int i = 0; i < 10; i++) {
-            size = size - .0005f;
-            genCylinder(gl, GL2.GL_QUAD_STRIP, 20, .0023f, size, false, rShade, gShade, bShade);
+            size = size - .00050f;
+            genCylinder(gl, GL2.GL_QUAD_STRIP, 13, .0023f, size, false, rShade, gShade, bShade, .002f);
         }
 
         for(int i = 0; i < 10; i++) {
-            size = size + .0005f;
-            genCylinder(gl, GL2.GL_QUAD_STRIP, 20, .0023f, -size, true, rShade, gShade, bShade);
+            size = size + .00050f;
+            genCylinder(gl, GL2.GL_QUAD_STRIP, 13, .0023f, -size, false, rShade, gShade, bShade, .002f);
         }
 
         gl.glEndList();
@@ -128,15 +121,42 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
         bShade = 0;
     }
 
+    private void genRectangle(GL2 gl, int connection, float length, float depth, float height)
+    {
+        gl.glBegin(connection);
+        gl.glColor3f(.8f, .7f, .5f);
+        gl.glVertex3f(-length/2, 0, -depth/2);
+        gl.glVertex3f(length/2, 0, -depth/2);
+        gl.glVertex3f(length/2, 0, depth/2);
+        gl.glVertex3f(-length/2, 0, depth/2);
+
+        gl.glVertex3f(-length/2, -height, -depth/2);
+        gl.glVertex3f(length/2, -height, -depth/2);
+        gl.glVertex3f(length/2, -height, depth/2);
+        gl.glVertex3f(-length/2, -height, depth/2);
+
+        gl.glVertex3f(-length/2, 0, -depth/2);
+        gl.glVertex3f(length/2, 0, -depth/2);
+        gl.glVertex3f(length/2, -height, -depth/2);
+        gl.glVertex3f(-length/2, -height, -depth/2);
+
+        gl.glVertex3f(-length/2, 0, depth/2);
+        gl.glVertex3f(length/2, 0, depth/2);
+        gl.glVertex3f(length/2, -height, depth/2);
+        gl.glVertex3f(-length/2, -height, depth/2);
+        gl.glEnd();
+    }
+
     private void genCylinder(GL2 gl, int connection, float length, float zScale, float radiusScale,
-                             boolean overrideShade, float rColor, float gColor, float bColor)
+                             boolean overrideShade, float rColor, float gColor, float bColor,
+                             float shadeSpeed)
     {
         float theta;
         for (int i = 0; i <= length; i++) {
             gl.glBegin(connection);
             radius1 = radius2;
             z += zScale;
-            shadeIncrement();
+            shadeIncrement(shadeSpeed);
             if(!overrideShade)
             {
                 rColor = rShade;
@@ -159,6 +179,13 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
         }
     }
 
+    private void setDrawBaseColor(float rColor, float gColor, float bColor)
+    {
+        rShade = rColor;
+        gShade = gColor;
+        bShade = bColor;
+    }
+
     private void setDrawSettings(float rad1, float rad2, float newX, float newY, float newZ)
     {
         radius1 = rad1;
@@ -168,26 +195,25 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
         z = newZ;
     }
 
-    private void shadeIncrement()
+    private void shadeIncrement(float shadeSpeed)
     {
-        rShade += .005f;
-        gShade += .005f;
-        bShade += .005f;
+        rShade += shadeSpeed;
+        gShade += shadeSpeed;
+        bShade += shadeSpeed;
     }
 
     private void render(GL2 gl, int width, int height) {
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         gl.glPushMatrix();
-        gl.glCallList(gutter_list);
-        gl.glTranslatef(1.55f,0,0);
+        //gl.glCallList(gutter_list);
+        gl.glTranslatef(1.57f,0,0);
         gl.glCallList(floor_list);
-        gl.glTranslatef(1.55f,0,0);
-        gl.glCallList(gutter_list);
-        gl.glTranslatef(-1.55f,0,0);
+        gl.glTranslatef(1.57f,0,0);
+        //gl.glCallList(gutter_list);
+        gl.glTranslatef(-1.57f,0,0);
         gl.glRotatef(-90,1,0,0);
         gl.glTranslatef(-1,9.5f,0);
-        gl.glTranslatef(0, -1, 0);
-        gl.glTranslatef(-1, 0, 0);
+
         gl.glCallList(pin_list); //7
         gl.glTranslatef(.67f, 0, 0);
         gl.glCallList(pin_list); //8
@@ -217,7 +243,7 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
         gl.glLoadIdentity();
 
         float widthHeightRatio = (float) getWidth() / (float) getHeight();
-        glu.gluPerspective(90, widthHeightRatio, 1, 100);
+        glu.gluPerspective(60, widthHeightRatio, 1, 100);
 
         gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadIdentity();
