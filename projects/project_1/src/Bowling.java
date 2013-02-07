@@ -111,16 +111,20 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
         setDrawBaseColor(0, 0, .3f);
         ball_list = gl.glGenLists(1);
         gl.glNewList(ball_list, GL2.GL_COMPILE);
-        float size = .005f;
-        for (int i = 0; i < 10; i++) {
-            size = size - .00050f;
-            genCylinder(gl, GL2.GL_QUAD_STRIP, 13, .0023f, size, false, rShade, gShade, bShade, .002f);
-        }
+        
+	genCylinder(gl, GL2.GL_QUAD_STRIP, 40, .0015f, .003f, false, rShade, gShade, bShade, .001f);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 40, .0015f, .0019f, false, rShade, gShade, bShade, .001f);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 40, .0015f, .0010f, false, rShade, gShade, bShade, .001f);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 40, .0015f, .0005f, false, rShade, gShade, bShade, .001f);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 40, .0015f, .00025f, false, rShade, gShade, bShade, .001f);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 40, .0015f, .0000f, false, rShade, gShade, bShade, .001f);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 40, .0015f, -.00025f, false, rShade, gShade, bShade, .001f);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 40, .0015f, -.0005f, false, rShade, gShade, bShade, .001f);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 40, .0015f, -.0010f, false, rShade, gShade, bShade, .001f);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 40, .0015f, -.0019f, false, rShade, gShade, bShade, .001f);
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 40, .0015f, -.003f, false, rShade, gShade, bShade, .001f);
+        genCylinder(gl, GL2.GL_TRIANGLE_FAN, 1, 0, 0, false, rShade, gShade, bShade, .001f);
 
-        for (int i = 0; i < 10; i++) {
-            size = size + .00050f;
-            genCylinder(gl, GL2.GL_QUAD_STRIP, 13, .0023f, -size, false, rShade, gShade, bShade, .002f);
-        }
 
         gl.glEndList();
 
