@@ -11,7 +11,7 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
     final static float SCROLL_SPEED = 0.1F;
     final static float MOUSE_SPEED = .003F;
 
-    int pin_list, floor_list, gutter_list, ball_list;
+    int pin_list, floor_list, gutter_list, ball_list, lanetop_list;
     GLU glu;
     float eyeZ, eyeX, eyeY, refZ, refX, refY, upZ, upX, upY;
     float rShade, gShade, bShade;
@@ -39,6 +39,13 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
         upZ = 0;
         upX = 0;
         upY = 1;
+    }
+
+    private void createLaneTopList(GL2 gl) {
+        lanetop_list = gl.glGenLists(1);
+        gl.glNewList(lanetop_list, GL2.GL_COMPILE);
+        genRectangle(gl,GL2.GL_QUADS,3.14f,2,2);
+        gl.glEndList();
     }
 
     private void createFloorList(GL2 gl) {
@@ -113,6 +120,40 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
 
         gl.glEndList();
 
+    }
+
+    private void createLane(GL2 gl)
+    {
+        gl.glCallList(gutter_list);
+        gl.glTranslatef(1.57f,0,0);
+        gl.glCallList(floor_list);
+        gl.glTranslatef(1.57f,0,0);
+        gl.glCallList(gutter_list);
+        gl.glTranslatef(-1.57f,0,0);
+        gl.glRotatef(-90,1,0,0);
+        gl.glTranslatef(-1,9.5f,0);
+
+        gl.glCallList(pin_list); //7
+        gl.glTranslatef(.67f, 0, 0);
+        gl.glCallList(pin_list); //8
+        gl.glTranslatef(.67f, 0, 0);
+        gl.glCallList(pin_list); //9
+        gl.glTranslatef(.67f, 0, 0);
+        gl.glCallList(pin_list); //10
+        gl.glTranslatef(-1.67f, -.5f, 0);
+        gl.glCallList(pin_list); //4
+        gl.glTranslatef(.67f, 0, 0);
+        gl.glCallList(pin_list); //5
+        gl.glTranslatef(.67f, 0, 0);
+        gl.glCallList(pin_list); //6
+        gl.glTranslatef(-1, -.5f, 0);
+        gl.glCallList(pin_list); //2
+        gl.glTranslatef(.67f, 0, 0);
+        gl.glCallList(pin_list); //3
+        gl.glTranslatef(-.33f, -.5f, 0);
+        gl.glCallList(pin_list); //1
+        gl.glTranslatef(0, -6f, 0);
+        gl.glCallList(ball_list);
     }
 
     private void resetShading() {
@@ -218,36 +259,13 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
     private void render(GL2 gl, int width, int height) {
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         gl.glPushMatrix();
-        //gl.glCallList(gutter_list);
-        gl.glTranslatef(1.57f,0,0);
-        gl.glCallList(floor_list);
-        gl.glTranslatef(1.57f,0,0);
-        //gl.glCallList(gutter_list);
-        gl.glTranslatef(-1.57f,0,0);
-        gl.glRotatef(-90,1,0,0);
-        gl.glTranslatef(-1,9.5f,0);
-
-        gl.glCallList(pin_list); //7
-        gl.glTranslatef(.67f, 0, 0);
-        gl.glCallList(pin_list); //8
-        gl.glTranslatef(.67f, 0, 0);
-        gl.glCallList(pin_list); //9
-        gl.glTranslatef(.67f, 0, 0);
-        gl.glCallList(pin_list); //10
-        gl.glTranslatef(-1.67f, -.5f, 0);
-        gl.glCallList(pin_list); //4
-        gl.glTranslatef(.67f, 0, 0);
-        gl.glCallList(pin_list); //5
-        gl.glTranslatef(.67f, 0, 0);
-        gl.glCallList(pin_list); //6
-        gl.glTranslatef(-1, -.5f, 0);
-        gl.glCallList(pin_list); //2
-        gl.glTranslatef(.67f, 0, 0);
-        gl.glCallList(pin_list); //3
-        gl.glTranslatef(-.33f, -.5f, 0);
-        gl.glCallList(pin_list); //1
-        gl.glTranslatef(0, -6f, 0);
-        gl.glCallList(ball_list);
+        createLane(gl);
+        gl.glTranslatef(2.5f,-2,0);
+        gl.glRotatef(-270,1,0,0);
+        createLane(gl);
+        gl.glTranslatef(2.5f,-2,0);
+        gl.glRotatef(-270,1,0,0);
+        createLane(gl);
         gl.glPopMatrix();
     }
 
