@@ -242,7 +242,8 @@ void showText (int x, int y, string msg)
 
 void showHelp()
 {
-    showText(5, 5, "Welcome...");
+    showText(5, 25, "Up: forward  Down:backward    Left/Right:roll");
+    showText(5, 5, "Shift Left/Right:  Yaw    Z/z: rotate around world-Z");
 }
 
 /********************************************************************/
