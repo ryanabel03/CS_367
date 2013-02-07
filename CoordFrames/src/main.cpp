@@ -48,6 +48,7 @@ void render(void)
     glCallList(cf_list);
     glPushMatrix();
     /* transform the teapot using its own frame */
+    
     // glLoadMatrixd(potCoordinateFrame); <== WRONG function used in class
     glMultMatrixd(potCoordFrame);
     glCallList(potlist);
@@ -100,9 +101,9 @@ void resize (int w, int h)
     /* always switch back to MODEVLVIEW matrix mode !!!! */
 	glMatrixMode (GL_MODELVIEW);
 	glLoadIdentity();
-    /* use the default camera placement: eye at origin, the camera is
-     viewing along the NEGATIVE z-axis, and the camera Y-axis
-     (its "up" axis) is parallel to the world Y-axis
+    /* use the default camera placement: eye at origin, 
+       the camera is pointed along the NEGATIVE z-axis, 
+       and the camera Y-axis (its "up" axis) is parallel to the world Y-axis
      */
     gluLookAt(1, 2.0, 5.0,
               0, 0, 0,
@@ -121,6 +122,33 @@ void keyHandler (unsigned char ch, int x, int y)
         case 0x1B: /* escape key */
             exit (0);
             break;
+        case 'z': /* rotate around the world Z-axis */
+            /* in the following code we use openGL matrix calls to
+             * perform the following multiplication:
+             *
+             *  F = Rot x F
+             *
+             *  [the effect is to rotate our coordinate frame around
+             *   the WORLD axis]
+             *  where F is our own coordinate frame and
+             *  Rot is the openGL rotation
+             */
+
+            glPushMatrix();
+            glLoadIdentity();
+            glRotatef (10, 0, 0, 1);
+            glMultMatrixd(potCoordFrame);
+            glGetDoublev(GL_MODELVIEW_MATRIX, potCoordFrame);
+            glPopMatrix();
+            break;
+        case 'Z': /* rotate around the world Z-axis */
+            glPushMatrix();
+            glLoadIdentity();
+            glRotatef (-10, 0, 0, 1);
+            glMultMatrixd(potCoordFrame);
+            glGetDoublev(GL_MODELVIEW_MATRIX, potCoordFrame);
+            glPopMatrix();
+            break;
     }
     glutPostRedisplay();
 }
@@ -134,50 +162,54 @@ void fkeyHandler (int key, int x, int y)
     if (key == GLUT_KEY_F12)
         exit(0);
     int mod = glutGetModifiers();
+    /* in the following code we use openGL matrix calls to
+     * perform the following multiplication:
+     *
+     *  F = F x Mat
+     *
+     * where F is our own coordinate frame and
+     * Mat is the openGL transformation operation
+     *
+     * [the effect is to transform our coordinate frame w.r.t to itself]
+     */
+    glPushMatrix();
+    glLoadMatrixd(potCoordFrame);    /* C = potCF              */
     if (mod == GLUT_ACTIVE_SHIFT) {
         switch (key) {
-            case GLUT_KEY_UP:
-                cout << "Shift-Up" << endl;
+            case GLUT_KEY_UP: /* pitch-up */
+                glRotatef(-20, 0, 0, 1);
                 break;
-            case GLUT_KEY_DOWN:
-                cout << "Shift-Down" << endl;
+            case GLUT_KEY_DOWN: /* pitch-down */
+                glRotatef(20, 0, 0, 1);
                 break;
             case GLUT_KEY_LEFT:
-                cout << "Shift-Left" << endl;
+                glRotatef(20, 0, 1, 0); /* yaw */
                 break;
             case GLUT_KEY_RIGHT:
-                cout << "Shift-Right" << endl;
+                glRotatef(-20, 0, 1, 0); /* yaw */
                 break;
         }
     }
     else {
         switch (key) {
-            case GLUT_KEY_UP:
+            case GLUT_KEY_UP: /* move forward */
                 /* multiply the teapot frame with X-translate */
-                glPushMatrix();
-                glLoadMatrixd(potCoordFrame);                     /* C = potCF              */
-                glTranslated(0.5, 0, 0);                          /* C = pot_CF * Translate */
-                glGetDoublev(GL_MODELVIEW_MATRIX, potCoordFrame); /* potCF = C */
-                glPopMatrix();
-                cout << "Up" << endl;
+                glTranslated(0.5, 0, 0);       /* C = pot_CF * Translate */
                 break;
-            case GLUT_KEY_DOWN:
-                glPushMatrix();
-                glLoadMatrixd(potCoordFrame);                     /* C = potCF              */
-                glTranslated(-0.5, 0, 0);                         /* C = pot_CF * Translate */
-                glGetDoublev(GL_MODELVIEW_MATRIX, potCoordFrame); /* potCF = C */
-                glPopMatrix();
-                cout << "Down" << endl;
+            case GLUT_KEY_DOWN: /* move backward */
+                glTranslated(-0.5, 0, 0);      /* C = pot_CF * Translate */
                 break;
-            case GLUT_KEY_LEFT:
-                cout << "Left" << endl;
+            case GLUT_KEY_LEFT:   /* roll */
+                glRotatef(-20, 1, 0, 0);       /* C = pot_CF * rot-x */
                 break;
-            case GLUT_KEY_RIGHT:
-                cout << "Right" << endl;
+            case GLUT_KEY_RIGHT:  /* roll */
+                glRotatef(+20, 1, 0, 0);       /* C = pot_CF * rot-x */
                 break;
         }
 
     }
+    glGetDoublev(GL_MODELVIEW_MATRIX, potCoordFrame); /* potCF = C */
+    glPopMatrix();
     glutPostRedisplay();
 }
 
