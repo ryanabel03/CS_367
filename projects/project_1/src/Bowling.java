@@ -60,7 +60,22 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
         floor_list = gl.glGenLists(1);
         gl.glNewList(floor_list, GL2.GL_COMPILE);
         genRectangle(gl, GL2.GL_QUADS, 2.6f, .2f, 20, .8f, .7f, .5f);
+        gl.glTranslatef(-1.3f, 0f ,0f);
+        for(int i = 0; i < 8; i++) {
+            gl.glTranslatef(.325f, 0f ,0f);
+            genLine(gl, GL2.GL_LINES, 0f, 0f, .4f, .1f, 0f);
+        }
+        gl.glTranslatef(-1.3f, 0f, 0f);
         gl.glEndList();
+    }
+
+    private void genLine(GL2 gl, int connection, float vertex1, float vertex2, float rColor, float gColor, float bColor) {
+        gl.glBegin(connection);
+        gl.glLineWidth(3f);
+        gl.glColor3f(rColor, gColor, bColor);
+        gl.glVertex3f(vertex1, vertex2, -10f);
+        gl.glVertex3f(vertex1, vertex2, 10f);
+        gl.glEnd();
     }
 
     private void createGutterList(GL2 gl) {
