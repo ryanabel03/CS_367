@@ -12,6 +12,7 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
     final static float MOUSE_SPEED = .003F;
 
     int pin_list, floor_list, gutter_list, ball_list, lane_case_list;
+    boolean wireframeOn;
     GLU glu;
     float eyeZ, eyeX, eyeY, refZ, refX, refY, upZ, upX, upY;
     float rShade, gShade, bShade;
@@ -41,13 +42,17 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
         upY = 1;
     }
 
-    private void createLaneTopList(GL2 gl) {
+    private void createLaneCaseList(GL2 gl) {
         lane_case_list = gl.glGenLists(1);
         gl.glNewList(lane_case_list, GL2.GL_COMPILE);
         genRectangle(gl, GL2.GL_QUADS, 3.68f, 4, .5f, .5f, .2f, .1f);
-        gl.glTranslatef(0,0,1);
+        gl.glTranslatef(0, 0, 1);
         genRectangle(gl, GL2.GL_QUADS, 3.68f, 2, 2, .5f, .2f, .1f);
-        gl.glTranslatef(0,0,-1);
+        gl.glTranslatef(-2f, -3.8f, 9);
+        genRectangle(gl, GL2.GL_QUADS, .32f, .2f, 20.5f, .5f, .2f, .1f);
+        gl.glTranslatef(4f,0,0);
+        genRectangle(gl, GL2.GL_QUADS, .32f, .2f, 20.5f, .5f, .2f, .1f);
+        gl.glTranslatef(-2f, 3.8f, -10);
         gl.glEndList();
     }
 
@@ -111,8 +116,8 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
         setDrawBaseColor(0, 0, .3f);
         ball_list = gl.glGenLists(1);
         gl.glNewList(ball_list, GL2.GL_COMPILE);
-        
-	genCylinder(gl, GL2.GL_QUAD_STRIP, 40, .0015f, .003f, false, rShade, gShade, bShade, .001f);
+
+        genCylinder(gl, GL2.GL_QUAD_STRIP, 40, .0015f, .003f, false, rShade, gShade, bShade, .001f);
         genCylinder(gl, GL2.GL_QUAD_STRIP, 40, .0015f, .0019f, false, rShade, gShade, bShade, .001f);
         genCylinder(gl, GL2.GL_QUAD_STRIP, 40, .0015f, .0010f, false, rShade, gShade, bShade, .001f);
         genCylinder(gl, GL2.GL_QUAD_STRIP, 40, .0015f, .0005f, false, rShade, gShade, bShade, .001f);
@@ -125,9 +130,7 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
         genCylinder(gl, GL2.GL_QUAD_STRIP, 40, .0015f, -.003f, false, rShade, gShade, bShade, .001f);
         genCylinder(gl, GL2.GL_TRIANGLE_FAN, 1, 0, 0, false, rShade, gShade, bShade, .001f);
 
-
         gl.glEndList();
-
     }
 
     private void createLane(GL2 gl) {
@@ -264,11 +267,11 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         gl.glPushMatrix();
         createLane(gl);
-        gl.glTranslatef(2.5f,0,1.25f);
-        gl.glRotatef(-270,1,0,0);
+        gl.glTranslatef(4.32f, 8.25f, 3.8f);
+        gl.glRotatef(-270, 1, 0, 0);
         createLane(gl);
-        gl.glTranslatef(2.5f,0,1.25f);
-        gl.glRotatef(-270,1,0,0);
+        gl.glTranslatef(4.32f, 8.25f, 3.8f);
+        gl.glRotatef(-270, 1, 0, 0);
         createLane(gl);
         gl.glPopMatrix();
     }
@@ -328,6 +331,12 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
             case KeyEvent.VK_R:
                 setDefault();
                 break;
+            case KeyEvent.VK_Q:
+                wireframeOn = true;
+                break;
+            case KeyEvent.VK_E :
+                wireframeOn = false;
+                break;
         }
         display();
     }
@@ -345,7 +354,7 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
         gl.glEnable(GL.GL_DEPTH_TEST);
         gl.glDepthFunc(GL.GL_LEQUAL);
 
-        createLaneTopList(gl);
+        createLaneCaseList(gl);
         createFloorList(gl);
         createGutterList(gl);
         createPinList(gl);
@@ -358,6 +367,11 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
 
     public void display(GLAutoDrawable glAutoDrawable) {
         GL2 gl = glAutoDrawable.getGL().getGL2();
+        if(wireframeOn)
+            gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, GL2.GL_LINE);
+        else
+            gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, GL2.GL_FILL);
+
         setCamera(gl);
         render(gl, glAutoDrawable.getWidth(), glAutoDrawable.getHeight());
     }
