@@ -165,7 +165,6 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
         gl.glTranslatef(-.33f, -.5f, 0);
         gl.glCallList(pin_list); //1
         gl.glTranslatef(0, -6f, 0);
-        gl.glCallList(ball_list);
     }
 
     private void resetShading() {
@@ -267,12 +266,20 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         gl.glPushMatrix();
         createLane(gl);
+        gl.glTranslatef(1,1,0);
+        gl.glCallList(ball_list);
+        gl.glTranslatef(-1,-1,0);
         gl.glTranslatef(4.32f, 8.25f, 3.8f);
         gl.glRotatef(-270, 1, 0, 0);
         createLane(gl);
+        gl.glTranslatef(-0.8f,-3,0);
+        gl.glCallList(ball_list);
+        gl.glTranslatef(0.8f,3,0);
         gl.glTranslatef(4.32f, 8.25f, 3.8f);
         gl.glRotatef(-270, 1, 0, 0);
         createLane(gl);
+        gl.glTranslatef(0,4,0);
+        gl.glCallList(ball_list);
         gl.glPopMatrix();
     }
 
@@ -332,10 +339,10 @@ public class Bowling extends GLCanvas implements GLEventListener, KeyListener, M
                 setDefault();
                 break;
             case KeyEvent.VK_Q:
-                wireframeOn = true;
-                break;
-            case KeyEvent.VK_E :
-                wireframeOn = false;
+                if(wireframeOn)
+                    wireframeOn = false;
+                else
+                    wireframeOn = true;
                 break;
         }
         display();
