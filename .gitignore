@@ -2,4 +2,8 @@ build
 *~
 *.o
 .DS_Store
+CMakeCache.txt
+CMakeFiles
+Debug
+cmake_install.cmake
 
