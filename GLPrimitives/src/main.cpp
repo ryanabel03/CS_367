@@ -435,7 +435,6 @@ void initStates()
             float angle = k * 25.0f * M_PI / 180.0;
             float x = R[ring] * cos(angle);
             float y = R[ring] * sin(angle);
-            cout << "Initialize " << start << " to " << x << " " << y << endl;
             points[start + 0] = x;
             points[start + 1] = y;
             points[start + 2] = 0.0;
