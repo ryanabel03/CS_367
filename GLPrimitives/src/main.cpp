@@ -11,7 +11,11 @@
 #else
 #include <GL/glut.h>
 #endif
+#include <math.h>
+#include <time.h>
+#include <cstdio>
 #include <iostream>
+#include <iterator>
 #include <sstream>
 #include <vector>
 #include <map>
@@ -39,8 +43,20 @@ vector<Pos2D> vertices;
 map<MenuEntries,unsigned int> menuMap;
 int tri_list, c_list; /* declare the two list handles */
 int ct_list;
+const float R[] = {0.8, 1.2, 1.73};
+float* points;
+float* colors;
+
+/* the indices type must be UNSIGNED_{BYTE, SHORT, or INT} !!!
+ * When your vertex arrays hold less than 256 vertices, use GLubyte
+ * When your vertex arrays hold less than 65536 vertices, use GLushort
+ * otherwise use GLUint
+ */
+GLushort * inner_indices, *outer_indices;
+const int NSEGMENTS = 4;
 bool isDragging;
 float bgColor[3];
+void recolor(int N, float[]);
 
 /********************************************************************/
 // Display callback
@@ -50,6 +66,7 @@ void render(void)
 //	cout << __PRETTY_FUNCTION__ << endl;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+#if 0
     glPushMatrix();
     glTranslatef (-0.5, 0, 0.0);
     glScalef(0.5, 1.0, 1);
@@ -60,6 +77,20 @@ void render(void)
     glTranslatef (0.5, 0, 0);
     glRotatef(30, 1, 0, 0);  /* rotate 30 around the x-axis */
     glCallList(ct_list);
+    glPopMatrix();
+#endif
+
+    glVertexPointer(4, GL_FLOAT, 0, points);
+    glColorPointer(4, GL_FLOAT, 0, colors);
+    glDrawElements(GL_QUAD_STRIP, 2*(NSEGMENTS + 1), GL_UNSIGNED_SHORT, inner_indices);
+    glDrawElements(GL_QUAD_STRIP, 2*(NSEGMENTS + 1), GL_UNSIGNED_SHORT, outer_indices);
+
+    /* draw the second quad band using a different shading */
+    recolor (3*(NSEGMENTS + 1), colors);
+    glPushMatrix();
+    glRotatef (150, 0, 0, 1);
+    glDrawElements(GL_QUAD_STRIP, 2*(NSEGMENTS + 1), GL_UNSIGNED_SHORT, inner_indices);
+    glDrawElements(GL_QUAD_STRIP, 2*(NSEGMENTS + 1), GL_UNSIGNED_SHORT, outer_indices);
     glPopMatrix();
 
 	glPolygonMode(GL_FRONT, GL_FILL);
@@ -131,8 +162,8 @@ void resize (int w, int h)
 	glMatrixMode (GL_PROJECTION);
 	glLoadIdentity();
 
-	GLfloat ratio;
 #if 0
+	GLfloat ratio;
 	if (w <= h) {
 		ratio = static_cast<GLfloat> (h) / w;
 		gluOrtho2D(-4.0, 4.0, -4.0 * ratio, 4.0 * ratio);
@@ -242,12 +273,19 @@ void mouseMotionHandler (int x, int y)
 /********************************************************************/
 void keyHandler (unsigned char ch, int x, int y)
 {
-    cout << glutGetModifiers() << endl;
+//    cout << glutGetModifiers() << endl;
     switch (ch)
     {
     case 0x1B: /* escape key */
         exit (0);
+    case 'w':
+        glPolygonMode(GL_FRONT, GL_LINE);
+        break;
+    case 'W':
+        glPolygonMode(GL_FRONT, GL_FILL);
+        break;
     }
+    glutPostRedisplay();
 
 }
 
@@ -330,6 +368,7 @@ void initStates()
     glEnd();
     glEndList();
 
+    
 
     ct_list = glGenLists(1);
     glNewList(ct_list, GL_COMPILE);
@@ -374,6 +413,82 @@ void initStates()
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
+    /* Enable use of vertex pointer */
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+
+    /* allocate vertex array and index arrays */
+    /* each vertex requires 4 numbers x, y, z, w and we have 3 rings */
+    const int NPOINTS = 4 * (NSEGMENTS + 1) * 3;
+    points = new float[NPOINTS];
+
+    /* the array size for color is usually the same as the size for vertices */
+    colors = new float[NPOINTS];
+    int start = 0;
+    recolor(NPOINTS/4, colors);
+    for (int ring = 0; ring < 3; ring++)
+    {
+        /* each segment is 25 degrees wide */
+        for (int k = 0; k < (NSEGMENTS + 1); k++)
+        {
+            /* the homogeneous coordinate is (____, ____, 0.0, 1.0) */
+            float angle = k * 25.0f * M_PI / 180.0;
+            float x = R[ring] * cos(angle);
+            float y = R[ring] * sin(angle);
+            cout << "Initialize " << start << " to " << x << " " << y << endl;
+            points[start + 0] = x;
+            points[start + 1] = y;
+            points[start + 2] = 0.0;
+            points[start + 3] = 1.0;
+            start += 4;
+        }
+    }
+
+    /* each ring has NSEGMENTS quads, but using QUAD_STRIP two adjacent
+       quads share two vertices */
+    inner_indices = new GLushort[(NSEGMENTS+1) * 2];
+    outer_indices = new GLushort[(NSEGMENTS+1) * 2];
+    /*
+     indices for the inner ring
+
+     indices[0] = 0;     indices[1] = 5;
+     indices[2] = 1;     indices[3] = 6;
+
+     indices[8] = 4;     indices[9] = 9; */
+
+    for (int k = 0; k < 2 * (NSEGMENTS + 1); k++)
+    {
+        inner_indices[k] = k/2;
+        if (k % 2 == 1)
+            inner_indices[k] += NSEGMENTS + 1;
+    }
+    /* indices for the outer ring
+        ind[0] = 5       ind[1] = 10;
+        ind[2] = 6       ind[3] = 11;
+        
+        ind[8] = 13      ind[9] = 18;
+     */
+    for (int k = 0; k < 2 * (NSEGMENTS + 1); k++)
+    {
+        outer_indices[k] = k/2 + NSEGMENTS + 1;
+        if (k % 2 == 1)
+            outer_indices[k] += NSEGMENTS + 1;
+    }
+}
+
+void recolor(int N, float c_arr[])
+{
+    c_arr[0] = rand() / (float) RAND_MAX;
+    c_arr[1] = rand() / (float) RAND_MAX;
+    c_arr[2] = rand() / (float) RAND_MAX;
+    c_arr[3] = 1.0;
+    for (int k = 1; k < N; k++)
+    {
+        colors[4*k] = colors[0];
+        colors[4*k + 1] = (float) k / N;
+        colors[4*k + 2] = colors[2];
+        colors[4*k + 3] = 1.0;
+    }
 }
 
 void initMenus()
@@ -417,6 +532,7 @@ int main (int argc, char** argv)
     glutCreateWindow("Simple GLUT");
 
     /* initial setup */
+    srand (time(0));
     initStates();
     initMenus();
 
