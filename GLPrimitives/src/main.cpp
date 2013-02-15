@@ -4,7 +4,23 @@
  *  Created on: 2013-01-21
  *      Author: Hans Dulimarta <dulimarh@cis.gvsu.edu>
  */
+#if 0
+  This program shows how to use glVertexPointer using either a buffer
+allocated either on the client memory or the graphics server memory.
 
+(A) To allocate memory space on the graphics server, follow this sequence:
+        glGenBuffers(....);
+        glBindBuffer(....);
+        glBufferData(.............);
+
+(B) To access the allocated memory above:
+        glBindBuffer(.....);
+        ptr = (typecasting_here *) glMapBuffer (..........);
+        manipulate data through "ptr"
+        glUnmapBuffer(.....);   /* IT IS IMPORTANT TO UNMAP, so the buffer
+                                   can be accessed by other parts of the program */
+
+#endif
 #include <cstdlib>
 #ifdef __APPLE__
 #include <GLUT/glut.h>
@@ -20,6 +36,9 @@
 #include <vector>
 #include <map>
 #include <utility>
+
+//#undef USE_BUFFER_OBJECT
+#define USE_BUFFER_OBJECT
 
 using namespace std;
 typedef pair<GLdouble, GLdouble> Pos2D;
@@ -41,8 +60,6 @@ GLdouble prMatrix[16];
 MenuEntries current_primitive;
 vector<Pos2D> vertices;
 map<MenuEntries,unsigned int> menuMap;
-int tri_list, c_list; /* declare the two list handles */
-int ct_list;
 const float R[] = {0.8, 1.2, 1.73};
 float* points;
 float* colors;
@@ -54,6 +71,11 @@ float* colors;
  */
 GLushort * inner_indices, *outer_indices;
 const int NSEGMENTS = 4;
+
+#ifdef USE_BUFFER_OBJECT
+GLuint vertex_buffer, inner_idx_buffer, outer_idx_buffer, color_buffer;
+#endif
+
 bool isDragging;
 float bgColor[3];
 void recolor(int N, float[]);
@@ -66,33 +88,48 @@ void render(void)
 //	cout << __PRETTY_FUNCTION__ << endl;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-#if 0
-    glPushMatrix();
-    glTranslatef (-0.5, 0, 0.0);
-    glScalef(0.5, 1.0, 1);
-    glCallList(ct_list);
-    glPopMatrix();
-
-    glPushMatrix();
-    glTranslatef (0.5, 0, 0);
-    glRotatef(30, 1, 0, 0);  /* rotate 30 around the x-axis */
-    glCallList(ct_list);
-    glPopMatrix();
-#endif
-
+#ifdef USE_BUFFER_OBJECT
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+    glVertexPointer(4, GL_FLOAT, 0, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, color_buffer);
+    glColorPointer(4, GL_FLOAT, 0, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, inner_idx_buffer);
+    glDrawElements(GL_QUAD_STRIP, 2*(NSEGMENTS + 1), GL_UNSIGNED_SHORT, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outer_idx_buffer);
+    glDrawElements(GL_QUAD_STRIP, 2*(NSEGMENTS + 1), GL_UNSIGNED_SHORT, 0);
+#else
     glVertexPointer(4, GL_FLOAT, 0, points);
     glColorPointer(4, GL_FLOAT, 0, colors);
     glDrawElements(GL_QUAD_STRIP, 2*(NSEGMENTS + 1), GL_UNSIGNED_SHORT, inner_indices);
     glDrawElements(GL_QUAD_STRIP, 2*(NSEGMENTS + 1), GL_UNSIGNED_SHORT, outer_indices);
+#endif
 
     /* draw the second quad band using a different shading */
+#ifdef USE_BUFFER_OBJECT
+    colors = (float *) glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+    if (colors) {
+        recolor (3*(NSEGMENTS + 1), colors);
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+    }
+#else
     recolor (3*(NSEGMENTS + 1), colors);
+#endif
+
     glPushMatrix();
     glRotatef (150, 0, 0, 1);
+#ifdef USE_BUFFER_OBJECT
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, inner_idx_buffer);
+    glDrawElements(GL_QUAD_STRIP, 2*(NSEGMENTS + 1), GL_UNSIGNED_SHORT, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outer_idx_buffer);
+    glDrawElements(GL_QUAD_STRIP, 2*(NSEGMENTS + 1), GL_UNSIGNED_SHORT, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+#else
     glDrawElements(GL_QUAD_STRIP, 2*(NSEGMENTS + 1), GL_UNSIGNED_SHORT, inner_indices);
     glDrawElements(GL_QUAD_STRIP, 2*(NSEGMENTS + 1), GL_UNSIGNED_SHORT, outer_indices);
-    glPopMatrix();
+#endif
 
+    glPopMatrix();
 	glPolygonMode(GL_FRONT, GL_FILL);
 	glColor3ub(255, 255, 0); /* render filled polygons in yellow */
 	glBegin(menuMap[current_primitive]);
@@ -177,7 +214,7 @@ void resize (int w, int h)
 #endif
     
 	glGetDoublev(GL_PROJECTION_MATRIX, prMatrix);
-    /* always switch back to MODEVLVIEW matrix mode !!!! */
+    /* always switch back to MODELVIEW matrix mode !!!! */
 	glMatrixMode (GL_MODELVIEW);
 	glLoadIdentity();
     /* glLoadIdentity(): use the default camera placement: eye at origin,
@@ -273,20 +310,32 @@ void mouseMotionHandler (int x, int y)
 /********************************************************************/
 void keyHandler (unsigned char ch, int x, int y)
 {
-//    cout << glutGetModifiers() << endl;
+    //    cout << glutGetModifiers() << endl;
     switch (ch)
     {
-    case 0x1B: /* escape key */
-        exit (0);
-    case 'w':
-        glPolygonMode(GL_FRONT, GL_LINE);
-        break;
-    case 'W':
-        glPolygonMode(GL_FRONT, GL_FILL);
-        break;
+        case 0x1B: /* escape key */
+            exit (0);
+        case 'r':
+#ifdef USE_BUFFER_OBJECT
+            glBindBuffer(GL_ARRAY_BUFFER, color_buffer);
+            colors = (float *) glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+            if (colors) {
+                recolor(3*(NSEGMENTS+1), colors);
+                glUnmapBuffer(GL_ARRAY_BUFFER);
+            }
+#else
+            recolor(3*(NSEGMENTS+1), colors);
+#endif
+            break;
+        case 'w':
+            glPolygonMode(GL_FRONT, GL_LINE);
+            break;
+        case 'W':
+            glPolygonMode(GL_FRONT, GL_FILL);
+            break;
     }
     glutPostRedisplay();
-
+    
 }
 
 void fkeyHandler (int key, int x, int y)
@@ -324,76 +373,6 @@ void primitiveSelector (int select)
 /********************************************************************/
 void initStates()
 {
-    /* create two separate display lists */
-    tri_list = glGenLists(1);
-    c_list = glGenLists(1);
-
-    /* populate each list here, compile only do not execute the list */
-    glNewList(tri_list, GL_COMPILE);
-    glBegin(GL_TRIANGLES);
-    glVertex2f(0.4, 1.0);
-    glVertex2f(-0.4, 1.0);
-    glVertex2f(0.0, -1.0);
-    glEnd();
-    glEndList();
-
-    /* populate each list here */
-    glNewList(c_list, GL_COMPILE);
-    /* letter C (crooked!) */
-    glBegin(GL_QUAD_STRIP);
-    glColor3f (1.0, .4, .25);
-    glVertex2f(0.5, 0.5);
-    glColor3f (0.8, .4, .75);
-    glVertex2f(0.6, 0.6);
-    glColor3f (1.0, .5, .25);
-    glVertex2f(0.1, 0.5);
-    glColor3f (0.7, .4, .75);
-    glVertex2f(0.05, 0.8);
-    glColor3f (1.0, .6, .25);
-    glVertex2f(-0.2, 0.3);
-    glColor3f (0.6, .4, .75);
-    glVertex2f(-0.5, 0.6);
-    glColor3f (1.0, .7, .25);
-    glVertex2f(-0.3, 0);
-    glColor3f (0.5, .4, .75);
-    glVertex2f(-0.75, 0);
-    glColor3f (1.0, .8, .25);
-    glVertex2f(-0.3, -0.3);
-    glColor3f (0.4, .4, .75);
-    glVertex2f(-0.5, -0.7);
-    glColor3f (1.0, .9, .25);
-    glVertex2f(0.2, -0.45);
-    glColor3f (0.3, .4, .75);
-    glVertex2f(0.2, -0.8);
-    glEnd();
-    glEndList();
-
-    
-
-    ct_list = glGenLists(1);
-    glNewList(ct_list, GL_COMPILE);
-    glCallList(tri_list);   /* render the triangle in the list */
-    glPushMatrix();
-    glTranslatef(-0.4, 1.0, 0.1);
-    glRotatef(-60, 0, 0, 1);
-    glCallList(c_list);
-    glPopMatrix();
-
-    glPushMatrix();
-    glTranslatef(0.4, 1.0, 0);
-    glRotatef(-120, 0, 0, 1);
-    glCallList(c_list);
-    glPopMatrix();
-
-    glPushMatrix();
-    glTranslatef(0.0, -1.0, 0);
-    glRotatef(90, 0, 0, 1);
-    glScalef(0.4, 0.4, 1.0);
-    glCallList(c_list);
-    glPopMatrix();
-
-    glEndList();
-
     current_primitive = MENU_PRIMITIVE_POINTS;
     isDragging = false;
     fill (bgColor, bgColor + 3, 0.0);
@@ -420,12 +399,41 @@ void initStates()
     /* allocate vertex array and index arrays */
     /* each vertex requires 4 numbers x, y, z, w and we have 3 rings */
     const int NPOINTS = 4 * (NSEGMENTS + 1) * 3;
+    const int NINDICES = (NSEGMENTS + 1) * 2;
+#ifndef USE_BUFFER_OBJECT
     points = new float[NPOINTS];
-
     /* the array size for color is usually the same as the size for vertices */
     colors = new float[NPOINTS];
+    /* each ring has NSEGMENTS quads, but using QUAD_STRIP two adjacent
+     quads share two vertices */
+    inner_indices = new GLushort[NINDICES];
+    outer_indices = new GLushort[NINDICES];
+#else
+    glGenBuffers(1, &vertex_buffer);
+    glGenBuffers(1, &inner_idx_buffer);
+    glGenBuffers(1, &outer_idx_buffer);
+    glGenBuffers(1, &color_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+    glBufferData(GL_ARRAY_BUFFER, NPOINTS*sizeof(float), NULL, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, color_buffer);
+    glBufferData(GL_ARRAY_BUFFER, NPOINTS*sizeof(float), NULL, GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, inner_idx_buffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, NINDICES * sizeof(GLushort), NULL, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outer_idx_buffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, NINDICES * sizeof(GLushort), NULL, GL_STATIC_DRAW);
+#endif
     int start = 0;
+
+#ifdef USE_BUFFER_OBJECT
+    glBindBuffer(GL_ARRAY_BUFFER, color_buffer);
+    colors = (float *) glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
     recolor(NPOINTS/4, colors);
+    glUnmapBuffer(GL_ARRAY_BUFFER);
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+    points = (float *) glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+#else
+    recolor(NPOINTS/4, colors);
+#endif
     for (int ring = 0; ring < 3; ring++)
     {
         /* each segment is 25 degrees wide */
@@ -443,10 +451,6 @@ void initStates()
         }
     }
 
-    /* each ring has NSEGMENTS quads, but using QUAD_STRIP two adjacent
-       quads share two vertices */
-    inner_indices = new GLushort[(NSEGMENTS+1) * 2];
-    outer_indices = new GLushort[(NSEGMENTS+1) * 2];
     /*
      indices for the inner ring
 
@@ -454,7 +458,11 @@ void initStates()
      indices[2] = 1;     indices[3] = 6;
 
      indices[8] = 4;     indices[9] = 9; */
-
+#ifdef USE_BUFFER_OBJECT
+    glUnmapBuffer(GL_ARRAY_BUFFER);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, inner_idx_buffer);
+    inner_indices = (GLushort *) glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE);
+#endif
     for (int k = 0; k < 2 * (NSEGMENTS + 1); k++)
     {
         inner_indices[k] = k/2;
@@ -467,12 +475,22 @@ void initStates()
         
         ind[8] = 13      ind[9] = 18;
      */
+#ifdef USE_BUFFER_OBJECT
+    glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outer_idx_buffer);
+    outer_indices = (GLushort *) glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE);
+#endif
     for (int k = 0; k < 2 * (NSEGMENTS + 1); k++)
     {
         outer_indices[k] = k/2 + NSEGMENTS + 1;
         if (k % 2 == 1)
             outer_indices[k] += NSEGMENTS + 1;
     }
+#ifdef USE_BUFFER_OBJECT
+    glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+#endif
 }
 
 void recolor(int N, float c_arr[])
@@ -483,10 +501,10 @@ void recolor(int N, float c_arr[])
     c_arr[3] = 1.0;
     for (int k = 1; k < N; k++)
     {
-        colors[4*k] = colors[0];
-        colors[4*k + 1] = (float) k / N;
-        colors[4*k + 2] = colors[2];
-        colors[4*k + 3] = 1.0;
+        c_arr[4*k] = c_arr[0];
+        c_arr[4*k + 1] = (float) k / N;
+        c_arr[4*k + 2] = c_arr[2];
+        c_arr[4*k + 3] = 1.0;
     }
 }
 
@@ -523,8 +541,38 @@ void initMenus()
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
+void idleHandler() {
+    static clock_t lastclock = 0;
+    clock_t diff = (clock() - lastclock) / (CLOCKS_PER_SEC / 1000);
+    if (diff < 250) return;
+    lastclock = clock();
+#ifdef USE_BUFFER_OBJECT
+    glBindBuffer(GL_ARRAY_BUFFER, color_buffer);
+    colors = (float *) glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+#endif
+    if (colors) {
+        recolor((NSEGMENTS+1) * 3, colors);
+#ifdef USE_BUFFER_OBJECT
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+#endif
+        glutPostRedisplay();
+    }
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+void on_exit()
+{
+    cout << "Cleaning up ..." << endl;
+#ifdef USE_BUFFER_OBJECT
+    glDeleteBuffers(1, &vertex_buffer);
+    glDeleteBuffers(1, &inner_idx_buffer);
+    glDeleteBuffers(1, &outer_idx_buffer);
+    glDeleteBuffers(1, &color_buffer);
+#endif
+}
+
 int main (int argc, char** argv)
 {
+    atexit(on_exit);
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
     glutInitWindowSize (600, 450);
@@ -540,6 +588,7 @@ int main (int argc, char** argv)
     glutReshapeFunc(resize);
     glutKeyboardFunc(keyHandler);
     glutSpecialFunc(fkeyHandler);
+//    glutIdleFunc(idleHandler);
     glutMouseFunc(mouseHandler);
     glutMotionFunc(mouseMotionHandler);
     glutMainLoop();
