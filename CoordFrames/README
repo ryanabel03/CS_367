@@ -13,3 +13,13 @@ be implemented by multiplying the CF with a new transformation.
      M * CF
 
   transforms the CF with respect to the global coordinate frame
+
+Compilation Instructions
+========================
+The matrix, vector, and quaternion operations in this example are
+implemented using the OpenGL Mathematics library found at
+http://glm.g-truc.net. 
+
+The API page of the GLM library is at http://glm.g-truc.net/api-0.9.4
+The source code of this library can be cloned from
+https://github.com/g-truc/glm.
