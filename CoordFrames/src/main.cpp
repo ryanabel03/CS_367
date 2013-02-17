@@ -15,11 +15,14 @@
 #include <sstream>
 #include <vector>
 #include <map>
+#include <deque>
 #include <utility>
+//#define GLM_MESSAGES
 #include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/transform.hpp>
+//#include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/matrix_interpolation.hpp>
+#include <glm/gtx/transform.hpp>
 #include "CoordFrame.h"
 
 
@@ -35,6 +38,7 @@ GLdouble mvMatrix[16];
 GLdouble prMatrix[16];
 
 glm::mat4 pot_cf;
+deque<glm::mat4> cf_store;
 vector<Pos2D> vertices;
 map<MenuEntries,unsigned int> menuMap;
 
@@ -118,6 +122,24 @@ void resize (int w, int h)
 	glGetDoublev(GL_MODELVIEW_MATRIX, mvMatrix);
 }
 
+float alpha_interpol;
+void timerHandler (int val)
+{
+    if (alpha_interpol < 1.0) {
+        cout << "interpolating at " << alpha_interpol << endl;
+        const glm::mat4& m1 = cf_store.front();
+        const glm::mat4& m2 = cf_store.back();
+        for (int k = 0; k < 4; k++)
+            for (int m = 0; m < 4; m++)
+                pot_cf[k][m] = (1.0 - alpha_interpol) * m1[k][m] + alpha_interpol * m2[k][m];
+        alpha_interpol += 0.02;
+        glutTimerFunc(50, timerHandler, 0);
+        glutPostRedisplay();
+    }
+    else
+        pot_cf = cf_store.back();
+}
+
 /********************************************************************/
 // Keyboard callback
 /********************************************************************/
@@ -128,6 +150,20 @@ void keyHandler (unsigned char ch, int x, int y)
     {
         case 0x1B: /* escape key */
             exit (0);
+            break;
+        case 'a': /* start animation */
+            if (cf_store.size() == 2) {
+                cout << "Start timer function" << endl;
+                alpha_interpol = 0.0f;
+                /* begin matrix interpolation */
+                glutTimerFunc(50, timerHandler, 1);
+            }
+            break;
+        case 's':
+            cf_store.push_back(pot_cf);
+            if (cf_store.size() > 2)
+                cf_store.pop_front();
+            cout << "Current CoordFrame is saved....." << endl;
             break;
         case 'z': /* rotate around the world Z-axis */
             /*
@@ -295,12 +331,7 @@ void initStates()
     glLineWidth(2.0);
     glPointSize(3.0);
 
-    /* use glLoadIdentity to initialize my teapot CF */
-    glPushMatrix();
-    glLoadIdentity();                                   /* C = I     */
-//    glGetDoublev(GL_MODELVIEW_MATRIX, potCoordFrame);   /* potCF = C */
-    glPopMatrix();
-
+    cf_store.push_back(pot_cf);
     
     /* render front polygons (CCW) as filled faces */
     glPolygonMode(GL_FRONT, GL_FILL);
