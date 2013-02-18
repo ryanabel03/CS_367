@@ -14,7 +14,7 @@ class CoordFrame;
 class Transformation {
 public:
     virtual ~Transformation() {}
-    virtual void pre_transform(CoordFrame*) = 0;
-    virtual void post_transform(CoordFrame*) = 0;
+    virtual void pre_transform(CoordFrame*) const = 0;
+    virtual void post_transform(CoordFrame*) const = 0;
 };
 #endif /* defined(__CoordFrames__Transformation__) */

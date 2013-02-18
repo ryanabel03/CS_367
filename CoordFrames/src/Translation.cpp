@@ -11,13 +11,13 @@ Translation::Translation (float tx, float ty, float tz)
     this->tz = tz;
 }
 
-void Translation::pre_transform (CoordFrame* cf) {
+void Translation::pre_transform (CoordFrame* cf) const {
     glm::mat4 m;
     m = glm::translate(tx, ty, tz) * cf->getMatrix();
     cf->setMatrix(m);
 }
 
-void Translation::post_transform (CoordFrame* cf) {
+void Translation::post_transform (CoordFrame* cf) const {
     glm::mat4 m;
     m = glm::translate(cf->getMatrix(), tx, ty, tz);
     cf->setMatrix(m);
