@@ -1,0 +1,7 @@
+OVERVIEW
+This example shows an animation of a wheel at the tip of two arms.
+The wheel rotates on its own axis while the arms themselves swing like a 
+pendulum.
+
+By maintaining separate coordinate frames for each object (one for the arms
+and for the wheel), a composite transformation can be easily calculated.
