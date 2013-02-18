@@ -28,7 +28,8 @@
 #include <glm/gtx/matrix_interpolation.hpp>
 #include <glm/gtx/transform.hpp>
 #include "CoordFrame.h"
-
+#include "Translation.h"
+#include "Rotation.h"
 
 using namespace std;
 
@@ -42,8 +43,8 @@ GLint viewport[4];
 GLdouble mvMatrix[16];
 GLdouble prMatrix[16];
 
-glm::mat4 pot_cf;
-deque<glm::mat4> cf_store;
+CoordFrame pot_cf;
+deque<CoordFrame> cf_store;
 vector<Pos2D> vertices;
 map<MenuEntries,unsigned int> menuMap;
 bool is_animating = false, in_help = false;
@@ -68,7 +69,7 @@ void render(void)
         glCallList(cf_list);
     glPushMatrix();
     /* transform the teapot using its own frame */
-    glMultMatrixf(&pot_cf[0][0]);
+    glMultMatrixf(pot_cf.getData());
     glCallList(potlist);
     glPopMatrix();
 
@@ -113,7 +114,7 @@ void resize (int w, int h)
 		gluOrtho2D(-4.0 * ratio, 4.0 * ratio, -4.0, 4.0);
 	}
 #else
-    gluPerspective(60, (float)w/h, 1, 10);
+    gluPerspective(60, (float)w/h, 0.5, 50);
 #endif
     
 	glGetDoublev(GL_PROJECTION_MATRIX, prMatrix);
@@ -136,53 +137,50 @@ void timerHandler (int val)
     /* interpolate alpha in [0,1] */
     if (alpha_interpol < 1.0) {
         is_animating = true;
-        const glm::mat4& teapot_m1 = cf_store.front();
-        const glm::mat4& teapot_m2 = cf_store.back();
+        const glm::mat4& teapot_m1 = cf_store.front().getMatrix();
+        const glm::mat4& teapot_m2 = cf_store.back().getMatrix();
         /* get the fourth column of our coordinate frame matrix */
         const glm::vec4& teapot_t1 = glm::column(teapot_m1, 3);
         const glm::vec4& teapot_t2 = glm::column(teapot_m2, 3);
         const glm::quat& teapot_q1 = glm::toQuat(teapot_m1);
         const glm::quat& teapot_q2 = glm::toQuat(teapot_m2);
         glm::quat q_alpha;
+        glm::mat4 teapot_m_alpha;
         switch(val) {
             case 'm':
                 /* matrix linear interpolation */
-                for (int k = 0; k < 4; k++)
-                {
-                    for (int m = 0; m < 4; m++)
-                        pot_cf[k][m] = (1.0 - alpha_interpol) * teapot_m1[k][m] +
-                        alpha_interpol * teapot_m2[k][m];
-                }
+                teapot_m_alpha = (1.0 - alpha_interpol) * teapot_m1 +
+                    alpha_interpol * teapot_m2;
                 break;
             case 'q':
                 /* quaternion linear interpolation */
                 q_alpha = glm::fastMix(teapot_q1, teapot_q2, alpha_interpol);
                 /* convert quaternion to a rotation matrix */
-                pot_cf = glm::toMat4(q_alpha);
+                teapot_m_alpha = glm::toMat4(q_alpha);
 
                 /* The quaternion takes only the Rotational component of our
                    coordinate frame matrix. We need to fill in the translational
                    component manually. */
 
-                // pot_cf[3] refers to the FOURTH column of the CF matrix
-                pot_cf[3] = (1 - alpha_interpol) * teapot_t1 +
+                // te___[3] refers to the FOURTH column of the CF matrix
+                teapot_m_alpha[3] = (1 - alpha_interpol) * teapot_t1 +
                     alpha_interpol * teapot_t2;
                 break;
             case 's':
                 /* quaternion spherical linear interpolation */
                 q_alpha = glm::mix(teapot_q1, teapot_q2, alpha_interpol);
                 /* convert quaternion to a rotation matrix */
-                pot_cf = glm::toMat4(q_alpha);
+                teapot_m_alpha = glm::toMat4(q_alpha);
 
                 /* The quaternion takes only the Rotational component of our
                  coordinate frame matrix. We need to fill in the translational
                  component manually. */
 
-                // pot_cf[3] refers to the FOURTH column of the CF matrix
-                pot_cf[3] = (1 - alpha_interpol) * teapot_t1 +
+                teapot_m_alpha[3] = (1 - alpha_interpol) * teapot_t1 +
                 alpha_interpol * teapot_t2;
                 break;
         }
+        pot_cf.setMatrix(teapot_m_alpha);
         alpha_interpol += 0.05;
         glutTimerFunc(50, timerHandler, val);
     }
@@ -198,7 +196,7 @@ void timerHandler (int val)
 /********************************************************************/
 void keyHandler (unsigned char ch, int x, int y)
 {
-    cout << glutGetModifiers() << endl;
+//    cout << glutGetModifiers() << endl;
     switch (ch)
     {
         case 0x1B: /* escape key */
@@ -240,10 +238,10 @@ void keyHandler (unsigned char ch, int x, int y)
              *  where F is our own coordinate frame and
              *  Rot is the openGL rotation
              */
-            pot_cf = glm::rotate (-10.0f, 0.0f, 0.0f, 1.0f) * pot_cf;
+//            pot_cf = glm::rotate (-10.0f, 0.0f, 0.0f, 1.0f) * pot_cf;
             break;
         case 'Z': /* rotate around the world Z-axis */
-            pot_cf = glm::rotate (+10.0f, 0.0f, 0.0f, 1.0f) * pot_cf;
+//            pot_cf = glm::rotate (+10.0f, 0.0f, 0.0f, 1.0f) * pot_cf;
             break;
     }
     glutPostRedisplay();
@@ -255,6 +253,15 @@ void keyHandler (unsigned char ch, int x, int y)
  */
 void fkeyHandler (int key, int x, int y)
 {
+    static Translation * Xpos5 = new Translation (0.5f, 0.0f, 0.0f);
+    static Translation * Xneg5 = new Translation (-0.5f, 0.0f, 0.0f);
+    static Rotation* RZneg20 = new Rotation (-20, 0, 0, 1);
+    static Rotation* RZpos20 = new Rotation (+20, 0, 0, 1);
+    static Rotation* RYneg20 = new Rotation (-20, 0, 1, 0);
+    static Rotation* RYpos20 = new Rotation (+20, 0, 1, 0);
+    static Rotation* RXneg20 = new Rotation (-20, 1, 0, 0);
+    static Rotation* RXpos20 = new Rotation (+20, 1, 0, 0);
+
     if (key == GLUT_KEY_F12)
         exit(0);
     int mod = glutGetModifiers();
@@ -271,16 +278,16 @@ void fkeyHandler (int key, int x, int y)
     if (mod == GLUT_ACTIVE_SHIFT) {
         switch (key) {
             case GLUT_KEY_UP: /* pitch-up */
-                pot_cf = pot_cf * glm::rotate (-20.0f, 0.0f, 0.0f, 1.0f);
+                pot_cf.execute(RZneg20);
                 break;
             case GLUT_KEY_DOWN: /* pitch-down */
-                pot_cf = pot_cf * glm::rotate (+20.0f, 0.0f, 0.0f, 1.0f);
+                pot_cf.execute(RZpos20);
                 break;
             case GLUT_KEY_LEFT:
-                pot_cf = pot_cf * glm::rotate (+20.0f, 0.0f, 1.0f, 0.0f);
+                pot_cf.execute(RYpos20);
                 break;
             case GLUT_KEY_RIGHT:
-                pot_cf = pot_cf * glm::rotate (-20.0f, 0.0f, 1.0f, 0.0f);
+                pot_cf.execute(RYneg20);
                 break;
         }
     }
@@ -288,16 +295,16 @@ void fkeyHandler (int key, int x, int y)
         switch (key) {
             case GLUT_KEY_UP: /* move forward */
                 /* multiply the teapot frame with X-translate */
-                pot_cf = pot_cf * glm::translate(0.5f, 0.0f, 0.0f);
+                pot_cf.execute(Xpos5);
                 break;
             case GLUT_KEY_DOWN: /* move backward */
-                pot_cf = pot_cf * glm::translate(-0.5f, 0.0f, 0.0f);
+                pot_cf.execute(Xneg5);
                 break;
             case GLUT_KEY_LEFT:   /* roll */
-                pot_cf = pot_cf * glm::rotate (-20.0f, 1.0f, 0.0f, 0.0f);
+                pot_cf.execute(RXneg20);
                 break;
             case GLUT_KEY_RIGHT:  /* roll */
-                pot_cf = pot_cf * glm::rotate (+20.0f, 1.0f, 0.0f, 0.0f);
+                pot_cf.execute(RXpos20);
                 break;
         }
 
