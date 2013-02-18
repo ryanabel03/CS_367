@@ -8,7 +8,10 @@
 
 #include "CoordFrame.h"
 
-void CoordFrame::execute (Transformation* t) {
-    t->transform(this);
+void CoordFrame::execute (Transformation* t, bool isPostOperate) {
+    if (isPostOperate)
+        t->post_transform(this);
+    else
+        t->pre_transform(this);
 }
 

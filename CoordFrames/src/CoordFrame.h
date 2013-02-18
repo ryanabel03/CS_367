@@ -19,8 +19,7 @@ class CoordFrame {
 public:
     /* Use the Strategy design pattern to handle various transformation
      * operations */
-//    void pre_execute (const Transformation&);
-    void execute (Transformation*);
+    void execute (Transformation*, bool);
 
     mat4 getMatrix() {
         return frame;

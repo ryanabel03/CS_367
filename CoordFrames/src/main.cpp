@@ -20,13 +20,9 @@
 #include <utility>
 //#define GLM_MESSAGES
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/gtx/quaternion.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/compatibility.hpp>
 #include <glm/gtx/matrix_interpolation.hpp>
-#include <glm/gtx/transform.hpp>
 #include "CoordFrame.h"
 #include "Translation.h"
 #include "Rotation.h"
@@ -238,10 +234,10 @@ void keyHandler (unsigned char ch, int x, int y)
              *  where F is our own coordinate frame and
              *  Rot is the openGL rotation
              */
-//            pot_cf = glm::rotate (-10.0f, 0.0f, 0.0f, 1.0f) * pot_cf;
+            pot_cf.execute(new Rotation(-10.0f, 0, 0, 1), false);
             break;
         case 'Z': /* rotate around the world Z-axis */
-//            pot_cf = glm::rotate (+10.0f, 0.0f, 0.0f, 1.0f) * pot_cf;
+            pot_cf.execute(new Rotation(+10.0f, 0, 0, 1), false);
             break;
     }
     glutPostRedisplay();
@@ -278,16 +274,16 @@ void fkeyHandler (int key, int x, int y)
     if (mod == GLUT_ACTIVE_SHIFT) {
         switch (key) {
             case GLUT_KEY_UP: /* pitch-up */
-                pot_cf.execute(RZneg20);
+                pot_cf.execute(RZneg20, true);
                 break;
             case GLUT_KEY_DOWN: /* pitch-down */
-                pot_cf.execute(RZpos20);
+                pot_cf.execute(RZpos20, true);
                 break;
             case GLUT_KEY_LEFT:
-                pot_cf.execute(RYpos20);
+                pot_cf.execute(RYpos20, true);
                 break;
             case GLUT_KEY_RIGHT:
-                pot_cf.execute(RYneg20);
+                pot_cf.execute(RYneg20, true);
                 break;
         }
     }
@@ -295,16 +291,16 @@ void fkeyHandler (int key, int x, int y)
         switch (key) {
             case GLUT_KEY_UP: /* move forward */
                 /* multiply the teapot frame with X-translate */
-                pot_cf.execute(Xpos5);
+                pot_cf.execute(Xpos5, true);
                 break;
             case GLUT_KEY_DOWN: /* move backward */
-                pot_cf.execute(Xneg5);
+                pot_cf.execute(Xneg5, true);
                 break;
             case GLUT_KEY_LEFT:   /* roll */
-                pot_cf.execute(RXneg20);
+                pot_cf.execute(RXneg20, true);
                 break;
             case GLUT_KEY_RIGHT:  /* roll */
-                pot_cf.execute(RXpos20);
+                pot_cf.execute(RXpos20, true);
                 break;
         }
 

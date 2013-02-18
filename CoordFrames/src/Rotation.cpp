@@ -12,7 +12,13 @@ Rotation::Rotation (float a, float ax, float ay, float az)
     this->az = az;
 }
 
-void Rotation::transform (CoordFrame* cf) {
+void Rotation::pre_transform (CoordFrame* cf) {
+    glm::mat4 m;
+    m = glm::rotate(angle, ax, ay, az) * cf->getMatrix();
+    cf->setMatrix(m);
+}
+
+void Rotation::post_transform (CoordFrame* cf) {
     glm::mat4 m;
     m = glm::rotate(cf->getMatrix(), angle, ax, ay, az);
     cf->setMatrix(m);

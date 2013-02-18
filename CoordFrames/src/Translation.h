@@ -14,7 +14,8 @@ class Translation : public Transformation {
 public:
     Translation (float tx, float ty, float tz);
 
-    void transform (CoordFrame* cf);
+    void pre_transform (CoordFrame* cf);
+    void post_transform (CoordFrame* cf);
 private:
     float tx, ty, tz;
 };
