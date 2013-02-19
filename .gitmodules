@@ -1,3 +1,3 @@
-[submodule "DroidGLES"]
-	path = DroidGLES
-	url = dulimar2@eos22.cis.gvsu.edu:DroidGLES
+[submodule "MathGL"]
+	path = MathGL
+	url = git://github.com/Groovounet/glm.git

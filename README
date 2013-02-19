@@ -1,3 +1,12 @@
+EXAMPLE SUBDIRECTORIES
+======================
+CoordFrames
+GLPrimitives
+MathGL: Linear Algebra Header file cloned from
+        https://github.com/g-truc/glm.
+
+IDEs
+====
 Most of the examples are configured using cmake (downloadable from
 cmake.org). Cmake can generate Makefile/project files for many different
 IDEs/platforms:
