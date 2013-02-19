@@ -1,0 +1,3 @@
+[submodule "DroidGLES"]
+	path = DroidGLES
+	url = dulimar2@eos22.cis.gvsu.edu:DroidGLES
