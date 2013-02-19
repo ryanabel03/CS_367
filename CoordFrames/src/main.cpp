@@ -5,6 +5,7 @@
  *      Author: Hans Dulimarta <dulimarh@cis.gvsu.edu>
  */
 
+#define GL_GLEXT_PROTOTYPES
 #include <cstdlib>
 #ifdef __APPLE__
 #include <GLUT/glut.h>

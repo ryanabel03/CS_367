@@ -33,7 +33,7 @@ void Cylinder::newInstance ()
         glVertex3f (top_rad * cos(angle), top_rad * sin(angle), height);
     }
     glEnd();
-    /* first make the base of the cone */
+    /* first make the base of the cylinder */
     glNormal3f (0, 0, -1);
     glBegin (GL_POLYGON);
     for (k = 0; k < NSIDE; k++) {

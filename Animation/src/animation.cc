@@ -83,7 +83,7 @@ void idleCallback()
     /* use the pendulum equation to calculate its angle */
     float angle = INIT_SWING_ANGLE *
         cos (swing_time * sqrt(swingarm->length()/GRAVITY) * M_PI / 180.0);
-    swing_time += 20;
+    swing_time += 10;
     swing_cf = glm::rotate(angle, 0.0f, 1.0f, 0.0f);
     last_timestamp = current;
 
