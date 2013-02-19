@@ -7,6 +7,8 @@
 
 #define GL_GLEXT_PROTOTYPES
 #include <cstdlib>
+// The following #define may be required to enable glWindowPos2i
+#define GL_GLEXT_PROTOTYPES
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
