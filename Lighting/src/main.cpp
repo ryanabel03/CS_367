@@ -12,6 +12,7 @@
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
+#include <GL/gl.h>
 #include <GL/glut.h>
 #endif
 #include <iostream>
@@ -210,9 +211,11 @@ void show_text (int x, int y, const string& msg)
     /* color must be set BEFORE glWindowPos* !!!!! */
     glColor3f(1,1,1); /* white text */
     /* Use the window coordinates to place the text */
+#ifdef GL_VERSION_1_5
     glWindowPos2i(x, y);
     for (int k = 0; k < msg.length(); k++)
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, msg[k]);
+#endif
 }
 
 /********************************************************************/
