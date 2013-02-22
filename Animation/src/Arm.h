@@ -11,8 +11,11 @@
 
 #include <iostream>
 #include "Model.h"
+#ifdef __APPLE__
 #include <OpenGL/glu.h>
-
+#else
+#include <GL/glu.h>
+#endif
 class Arm : public Model {
 public:
     Arm();

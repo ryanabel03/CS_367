@@ -7,6 +7,7 @@
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
+#include <GL/gl.h>
 #include <GL/glut.h>
 #endif
 #include <sys/time.h>
@@ -74,7 +75,7 @@ void idleCallback()
      * the same animation speed regardless of the CPU clock speed
      */
     delta = 1000.0 * (current - last_timestamp)/CLOCKS_PER_SEC;
-    if (delta < 250) return;
+    if (delta < 25) return;
     /* do the following every 250 ms */
 
     /* rotate the wheel by 20 degrees */
@@ -199,7 +200,7 @@ int main (int argc, char **argv)
     glutInitWindowPosition (0, 0); /* place window top left on display */
 
     glut_win = glutCreateWindow ("CS367 Computer Graphics");
-    srand (getpid());
+    srand (time(0));
     
     myGLInit ();
     myModelInit ();
