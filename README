@@ -5,6 +5,13 @@ GLPrimitives
 MathGL: Linear Algebra Header file cloned from
         https://github.com/g-truc/glm.
 
+Setting Up MathGL
+=================
+Run the following two git-commands to get a copy of the GLM clone:
+    git submodule init
+    git submodule update
+
+
 IDEs
 ====
 Most of the examples are configured using cmake (downloadable from

@@ -9,7 +9,6 @@
 #ifndef __CoordFrames__CoordFrame__
 #define __CoordFrames__CoordFrame__
 
-#include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "Transformation.h"

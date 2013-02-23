@@ -7,6 +7,7 @@
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
+#include <GL/gl.h>
 #include <GL/glut.h>
 #endif
 #include <sys/time.h>
@@ -264,7 +265,7 @@ int main (int argc, char **argv)
     glutInitWindowPosition (0, 0); /* place window top left on display */
 
     glut_win = glutCreateWindow ("CS367 Computer Graphics");
-    srand (getpid());
+    srand (time(0));
     
     myGLInit ();
     myModelInit ();

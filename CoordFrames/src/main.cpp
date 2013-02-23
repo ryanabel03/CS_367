@@ -5,8 +5,6 @@
  *      Author: Hans Dulimarta <dulimarh@cis.gvsu.edu>
  */
 
-#define GL_GLEXT_PROTOTYPES
-#include <cstdlib>
 // The following #define may be required to enable glWindowPos2i
 #define GL_GLEXT_PROTOTYPES
 #ifdef __APPLE__
@@ -15,6 +13,7 @@
 #include <GL/gl.h>
 #include <GL/glut.h>
 #endif
+#include <cstdlib>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -22,7 +21,6 @@
 #include <map>
 #include <deque>
 #include <utility>
-//#define GLM_MESSAGES
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/gtx/quaternion.hpp>
@@ -347,9 +345,14 @@ void show_text (int x, int y, const string& msg)
     /* color must be set BEFORE glWindowPos* !!!!! */
     glColor3f(1,1,1); /* white text */
     /* Use the window coordinates to place the text */
+    string m = msg;
+#ifdef GL_VERSION_1_5
     glWindowPos2i(x, y);
-    for (int k = 0; k < msg.length(); k++)
-        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, msg[k]);
+#else
+    m = "Your OpenGL version is older than 1.5: " + msg;
+#endif
+    for (int k = 0; k < m.length(); k++)
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, m[k]);
 }
 
 void showHelp()
