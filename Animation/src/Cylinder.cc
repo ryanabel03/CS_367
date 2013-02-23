@@ -50,7 +50,6 @@ void Cylinder::newInstance ()
         v3 = glm::vec3 (top_rad * cos(angle), top_rad * sin(angle), height);
         v4 = glm::vec3 (base_rad * cos(angle), base_rad * sin(angle), 0);
 
-        /* Use Algebra3.h */
         normal = glm::normalize(glm::cross(v1 - v2, v2 - v4));
 
         glNormal3f (normal[0], normal[1], normal[2]);

@@ -14,31 +14,25 @@
 #else
 #include <GL/glut.h>
 #endif
-#include <iostream>
-#include <sstream>
 #include <string>
-#include <vector>
 #include <map>
 #include <deque>
-#include <utility>
-//#define GLM_MESSAGES
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_access.hpp>
-#include <glm/gtx/quaternion.hpp>
-#include <glm/gtx/matrix_interpolation.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
 
 using namespace std;
 
-typedef pair<GLdouble, GLdouble> Pos2D;
-
 glm::vec4 lightpos (2, 1.4, 1.5, 1);
-glm::mat4 camera_cf;
+glm::mat4 camera_cf, pot_cf;
 
+float box_color[] = {0.5, 0.3, 0.0, 1.0};
 float material_ambi[] = {0.4, 0.4, 0.4, 1};
-float material_diff[] = {.0, 0.4, 0, 1};
+float material_diff[] = {.067, 0.76, 0.36, 1};
 float material_spec[] = {0.8, 0.8, 0.0, 1};
 float material_none[] = {0,0,0,1};
-GLubyte teapot_color[] = {170, 195, 92, 1};
+float teapot_color[] = {0.667, 0.7647, 0.3607, 1.0};
 
 int WIN_HEIGHT;
 float bgColor[3];
@@ -62,19 +56,20 @@ void render(void)
     glDisable(GL_LIGHTING);
     glPushMatrix();
     glTranslatef(lightpos[0], lightpos[1], lightpos[2]);
-    glutSolidSphere(0.1, 20, 4);
+    glutSolidSphere(0.1, 20, 12);
     glPopMatrix();
     glEnable(GL_LIGHTING);
-
+    
     glCallList(cf_list);
-    glPushMatrix();
+
+
     if (use_color_material) {
         glMaterialfv (GL_FRONT, GL_AMBIENT, material_none);
         glMaterialfv (GL_FRONT, GL_DIFFUSE, material_none);
         glMaterialfv (GL_FRONT, GL_SPECULAR, material_none);
-        glEnable(GL_COLOR_MATERIAL);
         glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-        glColor4ubv(teapot_color);
+        glEnable(GL_COLOR_MATERIAL);
+        glColor4fv(teapot_color);
     }
     else {
         glDisable(GL_COLOR_MATERIAL);
@@ -83,7 +78,19 @@ void render(void)
         glMaterialfv (GL_FRONT, GL_SPECULAR, material_spec);
         glMaterialf (GL_FRONT, GL_SHININESS, 127);  /* 0-127 */
     }
+    glPushMatrix();
+    glMultMatrixf(&pot_cf[0][0]);
     glCallList(potlist);
+    glPopMatrix();
+
+    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+    glEnable(GL_COLOR_MATERIAL);
+    glColor4fv(box_color);
+
+    glPushMatrix();
+    glTranslatef (0.0f, 0.0f, -.7f);
+    glScalef(3.0f, 3.0f, 0.1f);
+    glutSolidCube(1.0f);
     glPopMatrix();
 
 	glutSwapBuffers();
@@ -108,9 +115,9 @@ void resize (int w, int h)
        the camera is pointed along the NEGATIVE z-axis, 
        and the camera Y-axis (its "up" axis) is parallel to the world Y-axis
      */
-    gluLookAt(1, 2.0, 5.0,
+    gluLookAt(5, 2.0, 1.5,
               0, 0, 0,
-              0, 1, 0);
+              0, 0, 1);
 }
 
 /********************************************************************/
@@ -158,29 +165,19 @@ void fkeyHandler (int key, int x, int y)
     if (key == GLUT_KEY_F12)
         exit(0);
     int mod = glutGetModifiers();
-    /* in the following code we use openGL matrix calls to
-     * perform the following multiplication:
-     *
-     *  F = F x Mat
-     *
-     * where F is our own coordinate frame and
-     * Mat is the openGL transformation operation
-     *
-     * [the effect is to transform our coordinate frame w.r.t to itself]
-     */
     if (mod == GLUT_ACTIVE_SHIFT) {
         switch (key) {
-            case GLUT_KEY_UP: /* pitch-up */
-//                pot_cf.execute(RZneg20, true);
+            case GLUT_KEY_UP: /* pitch-down */
+                pot_cf = glm::rotate(pot_cf, -20.0f, 0.0f, 0.0f, 1.0f);
                 break;
-            case GLUT_KEY_DOWN: /* pitch-down */
-//                pot_cf.execute(RZpos20, true);
+            case GLUT_KEY_DOWN: /* pitch-uo */
+                pot_cf = glm::rotate(pot_cf, +20.0f, 0.0f, 0.0f, 1.0f);
                 break;
             case GLUT_KEY_LEFT:
-//                pot_cf.execute(RYpos20, true);
+                pot_cf = glm::rotate(pot_cf, +20.0f, 0.0f, 1.0f, 0.0f);
                 break;
             case GLUT_KEY_RIGHT:
-//                pot_cf.execute(RYneg20, true);
+                pot_cf = glm::rotate(pot_cf, -20.0f, 0.0f, 1.0f, 0.0f);
                 break;
         }
     }
@@ -188,16 +185,16 @@ void fkeyHandler (int key, int x, int y)
         switch (key) {
             case GLUT_KEY_UP: /* move forward */
                 /* multiply the teapot frame with X-translate */
-//                pot_cf.execute(Xpos5, true);
+                pot_cf = glm::translate(pot_cf, 0.5f, 0.0f, 0.0f);
                 break;
             case GLUT_KEY_DOWN: /* move backward */
-//                pot_cf.execute(Xneg5, true);
+                pot_cf = glm::translate(pot_cf, -0.5f, 0.0f, 0.0f);
                 break;
             case GLUT_KEY_LEFT:   /* roll */
-//                pot_cf.execute(RXneg20, true);
+                pot_cf = glm::rotate(pot_cf, -20.0f, 1.0f, 0.0f, 0.0f);
                 break;
             case GLUT_KEY_RIGHT:  /* roll */
-//                pot_cf.execute(RXpos20, true);
+                pot_cf = glm::rotate(pot_cf, +20.0f, 1.0f, 0.0f, 0.0f);
                 break;
         }
 
@@ -258,10 +255,13 @@ void initStates()
     glEndList();
 
     /* Setup the teapot */
+    pot_cf = glm::rotate(90.0f, 1.0f, 0.0f, 0.0f);
+    pot_cf = glm::rotate(pot_cf, 90.0f, 0.0f, 1.0f, 0.0f);
     potlist = glGenLists(1);
     glNewList(potlist, GL_COMPILE);
     glutSolidTeapot(1.0);
     glEndList();
+    
     fill (bgColor, bgColor + 3, 0.0);
     glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.0);
 
@@ -280,10 +280,14 @@ void initStates()
 
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
+    
+    /* enable automatic renormalization of normal vectors */
     glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_NORMALIZE);
     glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
     use_color_material = true;
 }
+
 int main (int argc, char** argv)
 {
     glutInit(&argc, argv);

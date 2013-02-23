@@ -27,7 +27,7 @@ void Arm::newInstance()
        We want to make the arm along the Z-neg. So 180 rotation is needed
      */
     glRotatef(180, 1, 0, 0);
-    gluCylinder(cyl_quad, 0.2, 0.2, LENGTH, 20, 5);
+    gluCylinder(cyl_quad, 0.2, 0.2, LENGTH, 20, 25);
     glEndList();
 }
 
