@@ -29,8 +29,9 @@
 using namespace std;
 
 glm::vec4 light0_pos (2, 1.4, 1.5, 1);
-glm::vec4 light1_diff (1.0, 1.0, 1.0, 1.0);
-glm::vec4 light1_spec (1.0, 0.9, 0.3, 1.0);
+float light0_diff[] = {1.0, 0.9, 0.05, 1};
+float light1_diff[] = {1.0, 1.0, 1.0, 1.0};
+float light1_spec[] = {1.0, 0.9, 0.3, 1.0};
 glm::mat4 camera_cf, pot_cf, spotlite_cf;
 
 float box_color[] = {0.5, 0.3, 0.0, 1.0};
@@ -38,6 +39,7 @@ float material_ambi[] = {195.0/255, 107.0/255, 41.0/255, 1};
 float material_diff[] = {0.67, 0.76, 0.36, 1};
 float material_spec[] = {0.8, 0.8, 0.0, 1};
 float material_none[] = {0.0f, 0.0f, 0.0f , 1.0f};
+//float material_emit[] = {0.6, 0.0, 0.0, 1.0};
 float teapot_color[] = {0.667, 0.7647, 0.3607, 1.0};
 
 int WIN_HEIGHT;
@@ -76,15 +78,25 @@ void render_scene(const string& title, bool use_ambi, bool use_diff, bool use_sp
     glLightfv(GL_LIGHT0, GL_POSITION, &light0_pos[0]);
     glLightfv(GL_LIGHT1, GL_POSITION, glm::value_ptr(glm::column(spotlite_cf, 3)));
     glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, &glm::column(spotlite_cf, 2)[0]);
-    glDisable(GL_LIGHTING);
+
+    if (show_cf) {
+        glPushAttrib(GL_LIGHTING_BIT);
+        glEnable(GL_COLOR_MATERIAL);
+        /* use the arrow color as the material property */
+        glCallList(cf_list[win_id]);
+        glPopAttrib();
+    }
 
     if (glIsEnabled(GL_LIGHT0)) {
         glPushMatrix();
+        glPushAttrib(GL_LIGHTING_BIT);
+        /* use the light source diffuse component as its emissive light */
+        glMaterialfv(GL_FRONT, GL_EMISSION, light0_diff);
         glTranslatef(light0_pos[0], light0_pos[1], light0_pos[2]);
-        glutSolidSphere(0.1, 20, 12);
+        glutSolidSphere(0.04, 20, 12);
+        glPopAttrib();
         glPopMatrix();
     }
-    glEnable(GL_LIGHTING);
     glMaterialfv (GL_FRONT, GL_AMBIENT, use_ambi ? material_ambi : material_none);
     glMaterialfv (GL_FRONT, GL_DIFFUSE, use_diff ? material_diff : material_none);
     glMaterialfv (GL_FRONT, GL_SPECULAR, use_spec ? material_spec : material_none);
@@ -97,13 +109,6 @@ void render_scene(const string& title, bool use_ambi, bool use_diff, bool use_sp
         glPopMatrix();
     }
 
-    if (show_cf) {
-        glDisable(GL_LIGHTING);
-        glCallList(cf_list[win_id]);
-        glEnable(GL_LIGHTING);
-    }
-
-
     /* render the teapot */
     glPushMatrix();
     glMultMatrixf(&pot_cf[0][0]);
@@ -111,12 +116,18 @@ void render_scene(const string& title, bool use_ambi, bool use_diff, bool use_sp
     glPopMatrix();
 
     /* render the base */
+    glPushAttrib(GL_LIGHTING_BIT);
+    glEnable(GL_COLOR_MATERIAL);
     glPushMatrix();
     glTranslatef (0.0f, 0.0f, -.7f);
     glScalef(3.0f, 3.0f, 0.1f);
+    glColorMaterial(GL_FRONT, GL_DIFFUSE);
+    glColor3ub (156, 60, 12);
+    glColorMaterial(GL_FRONT, GL_AMBIENT);
+    glColor3ub (0, 0, 0);
     glutSolidCube(1.0f);
     glPopMatrix();
-    glDisable(GL_LIGHTING);
+    glPopAttrib();
 
 	glutSwapBuffers();
 }
@@ -394,6 +405,7 @@ void initStates()
 
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light0_diff);
 
     glEnable(GL_LIGHT1);
     glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, spot_cutoff);
@@ -489,7 +501,7 @@ int main (int argc, char** argv)
      * window must have a 16:9 aspect ratio.
      */
     glutInitWindowSize (1280, 720);
-    win_ids.push_back(glutCreateWindow("Coordinate Frames"));
+    win_ids.push_back(glutCreateWindow("Local Lighting Model"));
     /* setup callback functions */
     glutDisplayFunc(render_main);
     glutReshapeFunc(resize);
