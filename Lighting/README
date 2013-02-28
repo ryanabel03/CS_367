@@ -1,0 +1,12 @@
+This example shows how to enable and use lighting in OpenGL. The typical
+steps for using lighting are:
+(1) Set the property of the light source(s)
+
+    Use glLightf(____) and glLigtfv(____) to do this step
+
+
+(2) Set the [reflective] material properties of the object(s)
+
+    Use glMaterial*(____) command to do this step
+
+

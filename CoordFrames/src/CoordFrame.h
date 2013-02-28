@@ -9,7 +9,6 @@
 #ifndef __CoordFrames__CoordFrame__
 #define __CoordFrames__CoordFrame__
 
-#include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "Transformation.h"
@@ -19,9 +18,9 @@ class CoordFrame {
 public:
     /* Use the Strategy design pattern to handle various transformation
      * operations */
-    void execute (Transformation*, bool);
+    void execute (const Transformation*, bool);
 
-    mat4 getMatrix() {
+    mat4 getMatrix() const {
         return frame;
     }
     

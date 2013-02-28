@@ -5,14 +5,15 @@
  *      Author: Hans Dulimarta <dulimarh@cis.gvsu.edu>
  */
 
-#include <cstdlib>
 // The following #define may be required to enable glWindowPos2i
 #define GL_GLEXT_PROTOTYPES
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
+#include <GL/gl.h>
 #include <GL/glut.h>
 #endif
+#include <cstdlib>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -20,7 +21,6 @@
 #include <map>
 #include <deque>
 #include <utility>
-//#define GLM_MESSAGES
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/gtx/quaternion.hpp>
@@ -45,7 +45,7 @@ CoordFrame pot_cf;
 deque<CoordFrame> cf_store;
 vector<Pos2D> vertices;
 map<MenuEntries,unsigned int> menuMap;
-bool is_animating = false, in_help = false;
+bool is_animating = false, in_help = false, has_moved = false;
 
 int WIN_HEIGHT;
 float bgColor[3];
@@ -222,10 +222,13 @@ void keyHandler (unsigned char ch, int x, int y)
             }
             break;
         case 'r':  /* record current frame */
-            cf_store.push_back(pot_cf);
-            /* keep the last two frames */
-            if (cf_store.size() > 2)
-                cf_store.pop_front();
+            if (has_moved) {
+                has_moved = false;
+                cf_store.push_back(pot_cf);
+                /* keep the last two frames */
+                if (cf_store.size() > 2)
+                    cf_store.pop_front();
+            }
             break;
         case 'z': /* rotate around the world Z-axis */
             /*
@@ -237,9 +240,11 @@ void keyHandler (unsigned char ch, int x, int y)
              *  Rot is the openGL rotation
              */
             pot_cf.execute(new Rotation(-10.0f, 0, 0, 1), false);
+            has_moved = true;
             break;
         case 'Z': /* rotate around the world Z-axis */
             pot_cf.execute(new Rotation(+10.0f, 0, 0, 1), false);
+            has_moved = true;
             break;
     }
     glutPostRedisplay();
@@ -277,15 +282,19 @@ void fkeyHandler (int key, int x, int y)
         switch (key) {
             case GLUT_KEY_UP: /* pitch-up */
                 pot_cf.execute(RZneg20, true);
+                has_moved = true;
                 break;
             case GLUT_KEY_DOWN: /* pitch-down */
                 pot_cf.execute(RZpos20, true);
+                has_moved = true;
                 break;
             case GLUT_KEY_LEFT:
                 pot_cf.execute(RYpos20, true);
+                has_moved = true;
                 break;
             case GLUT_KEY_RIGHT:
                 pot_cf.execute(RYneg20, true);
+                has_moved = true;
                 break;
         }
     }
@@ -294,15 +303,19 @@ void fkeyHandler (int key, int x, int y)
             case GLUT_KEY_UP: /* move forward */
                 /* multiply the teapot frame with X-translate */
                 pot_cf.execute(Xpos5, true);
+                has_moved = true;
                 break;
             case GLUT_KEY_DOWN: /* move backward */
                 pot_cf.execute(Xneg5, true);
+                has_moved = true;
                 break;
             case GLUT_KEY_LEFT:   /* roll */
                 pot_cf.execute(RXneg20, true);
+                has_moved = true;
                 break;
             case GLUT_KEY_RIGHT:  /* roll */
                 pot_cf.execute(RXpos20, true);
+                has_moved = true;
                 break;
         }
 
@@ -332,9 +345,14 @@ void show_text (int x, int y, const string& msg)
     /* color must be set BEFORE glWindowPos* !!!!! */
     glColor3f(1,1,1); /* white text */
     /* Use the window coordinates to place the text */
+    string m = msg;
+#ifdef GL_VERSION_1_5
     glWindowPos2i(x, y);
-    for (int k = 0; k < msg.length(); k++)
-        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, msg[k]);
+#else
+    m = "Your OpenGL version is older than 1.5: " + msg;
+#endif
+    for (int k = 0; k < m.length(); k++)
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, m[k]);
 }
 
 void showHelp()
@@ -346,8 +364,9 @@ void showHelp()
     string help_text[] = {
         "[Shift]+arrow keys to manipulate the teapot around its own coordinate frame",
         "z/Z  : rotate the teapot around the WORLD z-axis",
-        "r    : record the current coordinate frame in a queue",
-        "m,q,s: animate the teapot between the last two frames ",
+        "",
+        "r    : record the current coordinate frame to the queue",
+        "m/q/s: animate between the last two frames in the queue",
         "    m => use matrix linear interpolation",
         "    q => linear quaternion interpolation",
         "    s => spherical linear quaternion interpolation",

@@ -14,8 +14,8 @@ class Rotation : public Transformation {
 public:
     Rotation (float angle, float ax, float ay, float az);
 
-    void pre_transform (CoordFrame* cf);
-    void post_transform (CoordFrame* cf);
+    void pre_transform (CoordFrame* cf) const;
+    void post_transform (CoordFrame* cf) const;
 private:
     float angle, ax, ay, az;
 };
