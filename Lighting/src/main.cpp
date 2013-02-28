@@ -18,6 +18,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <vector>
 #include <deque>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_access.hpp>
@@ -33,16 +34,19 @@ glm::vec4 light1_spec (1.0, 0.9, 0.3, 1.0);
 glm::mat4 camera_cf, pot_cf, spotlite_cf;
 
 float box_color[] = {0.5, 0.3, 0.0, 1.0};
-float material_ambi[] = {0.4, 0.4, 0.4, 1};
-float material_diff[] = {.067, 0.76, 0.36, 1};
+float material_ambi[] = {195.0/255, 107.0/255, 41.0/255, 1};
+float material_diff[] = {0.67, 0.76, 0.36, 1};
 float material_spec[] = {0.8, 0.8, 0.0, 1};
-float material_none[] = {0,0,0,1};
+float material_none[] = {0.0f, 0.0f, 0.0f , 1.0f};
 float teapot_color[] = {0.667, 0.7647, 0.3607, 1.0};
 
 int WIN_HEIGHT;
+vector<int> win_ids;
 float bgColor[3];
-int potlist, cf_list, arrow_list, spotlite_list;
-bool use_color_material;
+map<int,int> potlist, cf_list, arrow_list, spotlite_list;
+//bool use_color_material;
+bool in_help_mode = false;
+bool show_ambient, show_diffuse, show_specular;
 float spot_cutoff = 20;
 int selected_light = 0;
 GLUquadric* qObj;
@@ -52,11 +56,23 @@ void show_text(int, int, const string&);
 /********************************************************************/
 // Display callback
 /********************************************************************/
-void render(void)
+void render_main()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glutSwapBuffers();
+}
 
-    show_help();
+void render_scene(const string& title, bool use_ambi, bool use_diff, bool use_spec,
+                  bool show_cf)
+{
+    int win_id = glutGetWindow();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    if (in_help_mode && win_id == win_ids[1]) {
+        show_help();
+    }
+    else
+        show_text (10, 10, title);
+
     glLightfv(GL_LIGHT0, GL_POSITION, &light0_pos[0]);
     glLightfv(GL_LIGHT1, GL_POSITION, glm::value_ptr(glm::column(spotlite_cf, 3)));
     glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, &glm::column(spotlite_cf, 2)[0]);
@@ -69,43 +85,30 @@ void render(void)
         glPopMatrix();
     }
     glEnable(GL_LIGHTING);
+    glMaterialfv (GL_FRONT, GL_AMBIENT, use_ambi ? material_ambi : material_none);
+    glMaterialfv (GL_FRONT, GL_DIFFUSE, use_diff ? material_diff : material_none);
+    glMaterialfv (GL_FRONT, GL_SPECULAR, use_spec ? material_spec : material_none);
+    glMaterialf (GL_FRONT, GL_SHININESS, 127);  /* 0-127 */
 
     if (glIsEnabled(GL_LIGHT1)) {
         glPushMatrix();
         glMultMatrixf (&spotlite_cf[0][0]);
-        glCallList(spotlite_list);
+        glCallList(spotlite_list[win_id]);
         glPopMatrix();
     }
 
-
-    glCallList(cf_list);
-
-
-    if (use_color_material) {
-        glMaterialfv (GL_FRONT, GL_AMBIENT, material_none);
-        glMaterialfv (GL_FRONT, GL_DIFFUSE, material_none);
-        glMaterialfv (GL_FRONT, GL_SPECULAR, material_none);
-        glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-        glEnable(GL_COLOR_MATERIAL);
-        glColor4fv(teapot_color);
+    if (show_cf) {
+        glDisable(GL_LIGHTING);
+        glCallList(cf_list[win_id]);
+        glEnable(GL_LIGHTING);
     }
-    else {
-        glDisable(GL_COLOR_MATERIAL);
-        glMaterialfv (GL_FRONT, GL_AMBIENT, material_ambi);
-        glMaterialfv (GL_FRONT, GL_DIFFUSE, material_diff);
-        glMaterialfv (GL_FRONT, GL_SPECULAR, material_spec);
-        glMaterialf (GL_FRONT, GL_SHININESS, 127);  /* 0-127 */
-    }
+
 
     /* render the teapot */
     glPushMatrix();
     glMultMatrixf(&pot_cf[0][0]);
-    glCallList(potlist);
+    glCallList(potlist[win_id]);
     glPopMatrix();
-
-    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-    glEnable(GL_COLOR_MATERIAL);
-    glColor4fv(box_color);
 
     /* render the base */
     glPushMatrix();
@@ -113,14 +116,58 @@ void render(void)
     glScalef(3.0f, 3.0f, 0.1f);
     glutSolidCube(1.0f);
     glPopMatrix();
+    glDisable(GL_LIGHTING);
 
 	glutSwapBuffers();
 }
 
+void render_all()
+{
+    render_scene("h: help", show_ambient, show_diffuse, show_specular, true);
+}
+
+void render_ambi()
+{
+    glClearColor(.2, .2, .2, 0.0);
+    render_scene("Ambient only", true, false, false, false);
+}
+
+void render_diff()
+{
+    glClearColor(.2, .2, .2, 0.0);
+    render_scene("Diffuse only", false, true, false, false);
+}
+
+void render_spec()
+{
+    glClearColor(.2, .2, .2, 0.0);
+    render_scene("Specular only", false, false, true, false);
+}
+
+void show_help()
+{
+    static string help_text[] = {
+        "0/1: toggle light source",
+        "F1/F2: select active light source",
+        "x/X/y/Y/z/Z : move the active light source",
+        "a/d/s: toggle ambient/diffuse/specular", 
+        "p/P: adjust the pan angle of the spotlight",
+        "t/T: adjust the tilt angle of the spotlight",
+        "Esc: quit"
+    };
+
+    const int N = sizeof(help_text) / sizeof(string);
+    const int HEIGHT = 20;
+    for (int k = 0; k < N; k++) {
+        show_text (5, (N - k) * HEIGHT, help_text[k]);
+    }
+}
+
+
 /********************************************************************/
 // Resize callback
 /********************************************************************/
-void resize (int w, int h)
+void subresize (int w, int h)
 {
     WIN_HEIGHT = h;
 	glViewport(0, 0, (GLint) w, (GLint) h);
@@ -139,6 +186,29 @@ void resize (int w, int h)
     gluLookAt(5, 2.0, 1.5,
               0, 0, 0,
               0, 0, 1);
+}
+
+void resize (int w, int h)
+{
+    glutSetWindow(win_ids[1]);
+    glutPositionWindow(0, 0);
+    glutReshapeWindow(3*w/4, h);
+    subresize(3*w/4, h);
+
+    glutSetWindow(win_ids[2]);
+    glutPositionWindow(3*w/4, 0);
+    glutReshapeWindow(w/4, h/3);
+    subresize(w/4, h/3);
+
+    glutSetWindow(win_ids[3]);
+    glutPositionWindow(3*w/4, h/3);
+    glutReshapeWindow(w/4, h/3);
+    subresize(w/4, h/3);
+
+    glutSetWindow(win_ids[4]);
+    glutPositionWindow(3*w/4, 2*h/3);
+    glutReshapeWindow(w/4, h/3);
+    subresize(w/4, h/3);
 }
 
 /********************************************************************/
@@ -164,6 +234,18 @@ void keyHandler (unsigned char ch, int x, int y)
             else
                 glEnable(GL_LIGHT1);
             break;
+        case 'a': /* toggle show ambient */
+            show_ambient ^= true;
+            break;
+        case 'd': /* toggle show diffuse */
+            show_diffuse ^= true;
+            break;
+        case 's': /* toggle show specular */
+            show_specular ^= true;
+            break;
+        case 'h':
+            in_help_mode ^= true;
+            break;
         case 'p': /* pan the spotlight */
             spotlite_cf = glm::rotate(spotlite_cf, +10.0f, 1.0f, 0.0f, 0.0f);
             break;
@@ -175,9 +257,6 @@ void keyHandler (unsigned char ch, int x, int y)
             break;
         case 'T':
             spotlite_cf = glm::rotate(spotlite_cf, -10.0f, 0.0f, 1.0f, 0.0f);
-            break;
-        case 'm':
-            use_color_material ^= true;
             break;
         default:
             if (selected_light == 0)
@@ -213,7 +292,11 @@ void keyHandler (unsigned char ch, int x, int y)
                 }
             }
     }
-    glutPostRedisplay();
+    for (int k = 0; k < win_ids.size(); k++)
+    {
+        glutSetWindow(win_ids[k]);
+        glutPostRedisplay();
+    }
 }
 
 /* Default Teapot orientation:
@@ -266,25 +349,10 @@ void fkeyHandler (int key, int x, int y)
         }
 
     }
-    glutPostRedisplay();
-}
-
-void show_help()
-{
-    static string help_text[] = {
-        "0/1: toggle light source",
-        "F1/F2: select active light source",
-        "x/X/y/Y/z/Z : move the active light source",
-        "p/P: adjust the pan angle of the spotlight",
-        "t/T: adjust the tilt angle of the spotlight",
-        "m: enable/disable color material",
-        "Esc: quit"
-    };
-
-    const int N = sizeof(help_text) / sizeof(string);
-    const int HEIGHT = 20;
-    for (int k = 0; k < N; k++) {
-        show_text (5, (N - k) * HEIGHT, help_text[k]);
+    for (int k = 0; k < win_ids.size(); k++)
+    {
+        glutSetWindow(win_ids[k]);
+        glutPostRedisplay();
     }
 }
 
@@ -334,17 +402,18 @@ void initStates()
     glLightfv(GL_LIGHT1, GL_DIFFUSE, &light1_diff[0]);
     glLightfv(GL_LIGHT1, GL_SPECULAR, &light1_spec[0]);
     /* enable automatic renormalization of normal vectors */
-    glEnable(GL_COLOR_MATERIAL);
     glEnable(GL_NORMALIZE);
+//    glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-    use_color_material = true;
+    show_ambient = show_diffuse = show_specular = true;
 }
 
 void initModels()
 {
+    int win_id = glutGetWindow();
     /* setup the axes */
-    arrow_list = glGenLists(1);
-    glNewList(arrow_list, GL_COMPILE);
+    arrow_list[win_id] = glGenLists(1);
+    glNewList(arrow_list[win_id], GL_COMPILE);
     glPushMatrix();
     glTranslatef(1, 0, 0);
     glScalef(2.0, .06, .06);
@@ -357,40 +426,40 @@ void initModels()
     glPopMatrix();
     glEndList();
 
-    cf_list = glGenLists(1);
-    glNewList(cf_list, GL_COMPILE);
+    cf_list[win_id] = glGenLists(1);
+    glNewList(cf_list[win_id], GL_COMPILE);
     /* draw the x-axis in red */
     glColor3ub(255,0,0);
-    glCallList(arrow_list);
+    glCallList(arrow_list[win_id]);
     /* draw the y-axis in green */
     glColor3ub(0, 255, 0);
     glPushMatrix();
     glRotatef(90, 0, 0, 1);
-    glCallList(arrow_list);
+    glCallList(arrow_list[win_id]);
     glPopMatrix();
 
     /* draw the z-axis in blue */
     glColor3ub(18, 168, 212);
     glPushMatrix();
     glRotatef(-90, 0, 1, 0);
-    glCallList(arrow_list);
+    glCallList(arrow_list[win_id]);
     glPopMatrix();
     glEndList();
 
     /* Setup the teapot */
     pot_cf = glm::rotate(90.0f, 1.0f, 0.0f, 0.0f);
     pot_cf = glm::rotate(pot_cf, 90.0f, 0.0f, 1.0f, 0.0f);
-    potlist = glGenLists(1);
-    glNewList(potlist, GL_COMPILE);
+    potlist[win_id] = glGenLists(1);
+    glNewList(potlist[win_id], GL_COMPILE);
     glutSolidTeapot(1.0);
     glEndList();
 
     /* setup the spotlite cone and coordinate frame */
     qObj = gluNewQuadric();
     /* create a display list for the spot light */
-    spotlite_list = glGenLists(1);
-    glNewList(spotlite_list,GL_COMPILE);
-    glCallList(cf_list);
+    spotlite_list[win_id] = glGenLists(1);
+    glNewList(spotlite_list[win_id],GL_COMPILE);
+    glCallList(cf_list[win_id]);
     const float CONE_HEIGHT = 1.0f;
     gluCylinder(qObj, 0, CONE_HEIGHT * tan(spot_cutoff * M_PI/180.0),
                 CONE_HEIGHT, 20, 5);
@@ -412,18 +481,45 @@ int main (int argc, char** argv)
     atexit(cleanup);
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-    glutInitWindowSize (800, 600);
-    glutCreateWindow("Coordinate Frames");
+    
+    /* The desired layout: one larger subwindow on the left side
+     * of the window that fills the entire height and three
+     * smaller subwindows stacked vertically on the right 
+     * To create a 4:3 aspect for all the subwindows, the entire
+     * window must have a 16:9 aspect ratio.
+     */
+    glutInitWindowSize (1280, 720);
+    win_ids.push_back(glutCreateWindow("Coordinate Frames"));
+    /* setup callback functions */
+    glutDisplayFunc(render_main);
+    glutReshapeFunc(resize);
 
     /* initial setup */
     initStates();
-    initModels();
 
-    /* setup callback functions */
-    glutDisplayFunc(render);
-    glutReshapeFunc(resize);
+    win_ids.push_back(glutCreateSubWindow(win_ids[0], 0, 0, 960, 720));
+    glutDisplayFunc(render_all);
     glutKeyboardFunc(keyHandler);
     glutSpecialFunc(fkeyHandler);
+    initStates();
+    initModels();
+
+    win_ids.push_back(glutCreateSubWindow(win_ids[0], 720, 0, 320, 240));
+    glutDisplayFunc(render_ambi);
+    initStates();
+    initModels();
+
+    win_ids.push_back(glutCreateSubWindow(win_ids[0], 720, 240, 320, 240));
+    glutDisplayFunc(render_diff);
+    initStates();
+    initModels();
+
+    win_ids.push_back(glutCreateSubWindow(win_ids[0], 720, 480, 320, 240));
+    glutDisplayFunc(render_spec);
+    initStates();
+    initModels();
+
+    glutSetWindow(win_ids[1]);
     glutMainLoop();
 }
 
