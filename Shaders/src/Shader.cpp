@@ -5,8 +5,13 @@
 //  Created by Hans Dulimarta on 02/24/13.
 //
 //
-
+#ifdef __APPLE__
 #include <OpenGL/gl.h>
+#else
+#define GL_GLEXT_PROTOTYPES
+#include <GL/gl.h>
+#include <GL/glext.h>
+#endif
 #include <algorithm>
 #include <fstream>
 #include <iterator>

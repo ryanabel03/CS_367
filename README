@@ -7,7 +7,8 @@ MathGL: Linear Algebra Header file cloned from
 
 Setting Up MathGL
 =================
-Run the following two git-commands to get a copy of the GLM clone:
+Run the following two git-commands (from this directory) to get a copy of the
+GLM clone: 
     git submodule init
     git submodule update
 
@@ -31,6 +32,7 @@ Additional tools needed to compile:
 2) C++ compiler: g++ or Visual C++ Express
 
 On Linux, use the freeglut3-dev package.
+
 On Windows, follow the instruction found at one of the following sites:
      http://user.xmission.com/~nate/glut.html
      http://www.opengl.org/resources/libraries/glut/
@@ -51,7 +53,9 @@ To compile using Eclipse (Linux/MacOS X)
 (1) mkdir build
 (2) cd build
 (3) cmake -G"Eclipse CDT4 - Unix Makefile" ../src  # generate an Eclipse project
-(4) Use Eclipse to import the project under the build subdirectory
+(4) Use Eclipse to import the generated project under the build subdirectory
+(5) Edit your C++ project property to add /usr/include to the project include 
+    fies
 
 To compile using Xcode (MacOS X)
 (1) mkdir build
