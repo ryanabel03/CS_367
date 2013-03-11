@@ -30,9 +30,8 @@ public class Wheel {
         for(int i = 0; i < NUM_SPOKES; i++) {
             double angle = i * 360.0 / NUM_SPOKES;
             gl.glPushMatrix();
-            gl.glRotated(angle, 0, 1, 0);
-            gl.glRotated(-90, 0, 1, 0);
-            glu.gluCylinder(quadric, 0.2, 0.2, 9.8, 50, 5);
+            gl.glRotated(angle-90, 0, 1, 0);
+            glu.gluCylinder(quadric, 0.2, 0.2, 9.92, 10, 5);
             gl.glPopMatrix();
         }
 

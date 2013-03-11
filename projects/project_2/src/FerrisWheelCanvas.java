@@ -1,3 +1,5 @@
+import com.jogamp.opengl.util.Animator;
+
 import javax.media.opengl.*;
 import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.fixedfunc.GLMatrixFunc;
@@ -11,6 +13,7 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
     final static float SCROLL_SPEED = 0.3F;
     final static float MOUSE_SPEED = .01F;
 
+    double rotateSpeed;
     boolean wireframeOn;
     GLU glu;
     float eyeZ, eyeX, eyeY, refZ, refX, refY, upZ, upX, upY;
@@ -26,6 +29,10 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
         this.addKeyListener(this);
         this.addMouseMotionListener(this);
         this.addMouseWheelListener(this);
+
+        Animator animator = new Animator(this);
+        animator.add(this);
+        animator.start();
     }
 
     private void initializeModels(GL2 gl) {
@@ -48,10 +55,15 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
     private void render(GL2 gl, int width, int height) {
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         gl.glPushMatrix();
+        gl.glRotated(-rotateSpeed, 0, 0, 1);
         gl.glCallList(wheelList);
-        gl.glTranslated(0,0,5);
+        gl.glTranslated(0, 0, 5);
         gl.glCallList(wheelList);
         gl.glPopMatrix();
+    }
+
+    private void update() {
+        rotateSpeed += 0.5;
     }
 
     private void setCamera(GL2 gl) {
@@ -129,6 +141,7 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
     public void init(GLAutoDrawable glAutoDrawable) {
         GL2 gl = glAutoDrawable.getGL().getGL2();
 
+        gl.setSwapInterval(1);
         initializeModels(gl);
 
         gl.glEnable(GL.GL_DEPTH_TEST);
@@ -145,6 +158,8 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
             gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, GL2.GL_LINE);
         else
             gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, GL2.GL_FILL);
+
+        update();
 
         setCamera(gl);
         render(gl, glAutoDrawable.getWidth(), glAutoDrawable.getHeight());
