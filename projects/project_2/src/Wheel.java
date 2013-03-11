@@ -20,11 +20,13 @@ public class Wheel {
     public int createWheelList() {
         int NUM_SPOKES = 6;
 
-        int list_id = gl.glGenLists(1);
-        gl.glNewList(list_id, GL2.GL_COMPILE);
-        glu.gluCylinder(quadric, 10, 10, 1, 1, 1);
+        int listId = gl.glGenLists(1);
+        gl.glNewList(listId, GL2.GL_COMPILE);
+        gl.glPushMatrix();
+        glu.gluCylinder(quadric, 10, 10, 1, 50, 5);
+        gl.glPopMatrix();
         gl.glEndList();
 
-        return list_id;
+        return listId;
     }
 }

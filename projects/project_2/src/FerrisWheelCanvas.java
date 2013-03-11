@@ -7,14 +7,14 @@ import java.awt.event.*;
 
 public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyListener, MouseMotionListener, MouseWheelListener {
     /* SETTINGS */
-    final static float KEY_SPEED = 0.2F;
-    final static float SCROLL_SPEED = 0.1F;
-    final static float MOUSE_SPEED = .003F;
+    final static float KEY_SPEED = 0.5F;
+    final static float SCROLL_SPEED = 0.3F;
+    final static float MOUSE_SPEED = .01F;
 
     boolean wireframeOn;
     GLU glu;
     float eyeZ, eyeX, eyeY, refZ, refX, refY, upZ, upX, upY;
-    int wheel_list;
+    int wheelList;
     Wheel wheel;
 
     public FerrisWheelCanvas(GLCapabilities capabilities) {
@@ -28,14 +28,14 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
         this.addMouseWheelListener(this);
     }
 
-    private void initializeModels(GL gl) {
+    private void initializeModels(GL2 gl) {
         wheel = new Wheel(10, 1, glu, gl);
-        wheel_list = wheel.createWheelList();
+        wheelList = wheel.createWheelList();
     }
 
     private void setDefault() {
-        eyeZ = 5;
-        eyeX = 0;
+        eyeZ = 20;
+        eyeX = 5;
         eyeY = 0;
         refZ = 0;
         refX = 0;
@@ -48,6 +48,9 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
     private void render(GL2 gl, int width, int height) {
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         gl.glPushMatrix();
+        gl.glCallList(wheelList);
+        gl.glTranslated(0,0,5);
+        gl.glCallList(wheelList);
         gl.glPopMatrix();
     }
 
