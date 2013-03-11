@@ -23,6 +23,7 @@ public class Chairs {
         gl.glTranslated(0, -2, 0);
 
         double alpha = Math.PI * 2 / NUM_CHAIRS;
+
         for(int i = 0; i < NUM_CHAIRS; i++) {
             gl.glPushMatrix();
 

@@ -24,6 +24,7 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
     private Chairs chairs;
     private int chairList;
     FloatBuffer light0Color;
+    private double previousPosition = 0;
 
     public FerrisWheelCanvas(GLCapabilities capabilities) {
         super(capabilities);
@@ -71,8 +72,17 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
         gl.glCallList(wheelList);
         gl.glTranslated(0, 0, 5);
         gl.glCallList(wheelList);
+
+        double alpha = Math.PI * 2 / 6;
+
+        double theta = alpha * previousPosition;
+
+        previousPosition++;
+
+        gl.glTranslated(Math.cos(theta) * 10, 0, Math.sin(theta) * 10);
         gl.glCallList(chairList);
         gl.glPopMatrix();
+
     }
 
     private void update() {
