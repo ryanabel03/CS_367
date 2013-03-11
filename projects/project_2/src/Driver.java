@@ -1,10 +1,8 @@
-import javax.media.opengl.GLCapabilities;
-import javax.media.opengl.GLProfile;
 import javax.swing.*;
+import javax.media.opengl.*;
 
 public class Driver {
-
-    public Driver(YoyoAnimation canvas) {
+    public Driver(FerrisWheel canvas) {
         JFrame frame = new JFrame("Project 2");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -15,10 +13,10 @@ public class Driver {
     }
 
     public static void main(String[] args) {
-        GLProfile glProfile = GLProfile.getDefault();
-        GLCapabilities capabilities = new GLCapabilities(glProfile);
+        GLProfile glprofile = GLProfile.getDefault();
+        GLCapabilities capabilities = new GLCapabilities(glprofile);
+        FerrisWheel canvas = new FerrisWheel(capabilities);
 
-
+        Driver instance = new Driver(canvas);
     }
 }
-
