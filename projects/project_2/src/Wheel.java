@@ -25,7 +25,7 @@ public class Wheel {
         gl.glPushMatrix();
         glu.gluCylinder(quadric, 10, 10, 1, 50, 5);
         gl.glRotated(-270, 1, 0, 0);
-        gl.glTranslated(0, 1, 0);
+        gl.glTranslated(0, 0.5, 0);
 
         for(int i = 0; i < NUM_SPOKES; i++) {
             double angle = i * 360.0 / NUM_SPOKES;

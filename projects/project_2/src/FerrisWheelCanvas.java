@@ -6,6 +6,8 @@ import javax.media.opengl.fixedfunc.GLMatrixFunc;
 import javax.media.opengl.glu.GLU;
 import java.awt.*;
 import java.awt.event.*;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 
 public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyListener, MouseMotionListener, MouseWheelListener {
     /* SETTINGS */
@@ -19,6 +21,7 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
     float eyeZ, eyeX, eyeY, refZ, refX, refY, upZ, upX, upY;
     int wheelList;
     Wheel wheel;
+    FloatBuffer light0Color;
 
     public FerrisWheelCanvas(GLCapabilities capabilities) {
         super(capabilities);
@@ -33,6 +36,10 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
         Animator animator = new Animator(this);
         animator.add(this);
         animator.start();
+
+        float[] light0Values = {1f, 1f, 1f, 1f};
+        light0Color = ByteBuffer.allocateDirect(4*4).asFloatBuffer();
+        light0Color.put(light0Values);
     }
 
     private void initializeModels(GL2 gl) {
@@ -63,7 +70,7 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
     }
 
     private void update() {
-        rotateSpeed += 0.5;
+        rotateSpeed += 0.2;
     }
 
     private void setCamera(GL2 gl) {
@@ -154,14 +161,22 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
 
     public void display(GLAutoDrawable glAutoDrawable) {
         GL2 gl = glAutoDrawable.getGL().getGL2();
+
         if(wireframeOn)
             gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, GL2.GL_LINE);
         else
             gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, GL2.GL_FILL);
 
-        update();
+        gl.glEnable(GL2.GL_LIGHTING);
+        gl.glEnable(GL2.GL_NORMALIZE);
+        gl.glEnable(GL2.GL_COLOR_MATERIAL);
+        gl.glColorMaterial(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE);
+
+        gl.glEnable(GL2.GL_LIGHT0);
+        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, light0Color);
 
         setCamera(gl);
+        update();
         render(gl, glAutoDrawable.getWidth(), glAutoDrawable.getHeight());
     }
 
