@@ -2,7 +2,7 @@ import javax.swing.*;
 import javax.media.opengl.*;
 
 public class Driver {
-    public Driver(FerrisWheel canvas) {
+    public Driver(FerrisWheelCanvas canvas) {
         JFrame frame = new JFrame("Project 2");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -15,7 +15,7 @@ public class Driver {
     public static void main(String[] args) {
         GLProfile glprofile = GLProfile.getDefault();
         GLCapabilities capabilities = new GLCapabilities(glprofile);
-        FerrisWheel canvas = new FerrisWheel(capabilities);
+        FerrisWheelCanvas canvas = new FerrisWheelCanvas(capabilities);
 
         Driver instance = new Driver(canvas);
     }
