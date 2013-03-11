@@ -16,6 +16,8 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
     float eyeZ, eyeX, eyeY, refZ, refX, refY, upZ, upX, upY;
     int wheelList;
     Wheel wheel;
+    private Chairs chairs;
+    private int chairList;
 
     public FerrisWheelCanvas(GLCapabilities capabilities) {
         super(capabilities);
@@ -31,6 +33,9 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
     private void initializeModels(GL2 gl) {
         wheel = new Wheel(10, 1, glu, gl);
         wheelList = wheel.createWheelList();
+        chairs = new Chairs(glu, gl);
+        chairList = chairs.createChairs();
+
     }
 
     private void setDefault() {
@@ -49,8 +54,9 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         gl.glPushMatrix();
         gl.glCallList(wheelList);
-        gl.glTranslated(0,0,5);
+        gl.glTranslated(0, 0, 5);
         gl.glCallList(wheelList);
+        gl.glCallList(chairList);
         gl.glPopMatrix();
     }
 
