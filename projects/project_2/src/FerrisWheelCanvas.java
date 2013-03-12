@@ -2,30 +2,57 @@ import com.jogamp.opengl.util.Animator;
 
 import javax.media.opengl.*;
 import javax.media.opengl.awt.GLCanvas;
+import javax.media.opengl.fixedfunc.GLLightingFunc;
 import javax.media.opengl.fixedfunc.GLMatrixFunc;
 import javax.media.opengl.glu.GLU;
 import java.awt.*;
 import java.awt.event.*;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
 
 public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyListener, MouseMotionListener, MouseWheelListener {
     /* SETTINGS */
     final static float KEY_SPEED = 0.5F;
     final static float SCROLL_SPEED = 0.3F;
     final static float MOUSE_SPEED = .01F;
+    final static int NUM_CHAIRS = 6;
 
-    double rotateSpeed;
-    boolean wireframeOn;
-    GLU glu;
-    float eyeZ, eyeX, eyeY, refZ, refX, refY, upZ, upX, upY;
+    private double rotateSpeed;
+    private boolean wireframeOn;
+    private GLU glu;
+    private GL2 gl;
+
+    private float eyeZ, eyeX, eyeY, refZ, refX, refY, upZ, upX, upY;
+
     private Chairs chairs;
     private Wheel wheel;
     private Frame frame;
     private int chairList, wheelList, frameList;
-    FloatBuffer light0Color;
+
     private double previousPosition = 0;
-    private double prevX, prevZ;
+    private double previousChairAngle = 0;
+    private boolean swingDirection = true;
+
+    private boolean lightZeroEnabled = false;
+    private boolean lightOneEnabled = false;
+
+    //chrome
+    private float[] chromeDiffuse, chromeAmbient, chromeSpecular, chromeShiny;
+    private float[][] chrome;
+
+    //polished gold
+    private float[] pGoldDiffuse, pGoldAmbient, pGoldSpecular, pGoldShiny;
+    private float[][] pGold;
+
+    //emerald
+    private float[] emeraldDiffuse, emeraldAmbient, emeraldSpecular, emeraldShiny;
+    private float[][] emerald;
+
+    //ruby
+    private float[] rubyDiffuse, rubyAmbient, rubySpecular, rubyShiny;
+    private float[][] ruby;
+
+    //turquoise
+    private float[] turquoiseDiffuse, turquoiseAmbient, turquoiseSpecular, turquoiseShiny;
+    private float[][] turquoise;
 
     public FerrisWheelCanvas(GLCapabilities capabilities) {
         super(capabilities);
@@ -41,18 +68,66 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
         animator.add(this);
         animator.start();
 
-        float[] light0Values = {1f, 1f, 1f, 1f};
-        light0Color = ByteBuffer.allocateDirect(4*4).asFloatBuffer();
-        light0Color.put(light0Values);
+        setMaterialColors();
     }
 
-    private void initializeModels(GL2 gl) {
-        wheel = new Wheel(glu, gl);
+    private void setMaterialColors() {
+        chromeDiffuse = new float[]{0.25f, 0.25f, 0.25f, 1};
+        chromeAmbient = new float[]{0.4f, 0.4f, 0.4f, 1};
+        chromeSpecular = new float[]{0.774597f, 0.774597f, 0.774597f, 1};
+        chromeShiny = new float[]{76.800003f};
+        chrome = new float[][]{chromeDiffuse, chromeAmbient, chromeSpecular, chromeShiny};
+
+        pGoldDiffuse = new float[]{0.24725f, 0.2245f, 0.0645f, 1};
+        pGoldAmbient = new float[]{0.34615f, 0.3143f, 0.0903f, 1};
+        pGoldSpecular = new float[]{0.797357f, 0.723991f, 0.208006f, 1};
+        pGoldShiny = new float[]{83.199997f};
+        pGold = new float[][]{pGoldDiffuse, pGoldAmbient, pGoldSpecular, pGoldShiny};
+
+        emeraldDiffuse = new float[]{0.0215f, 0.1745f, 0.0215f, 0.55f};
+        emeraldAmbient = new float[]{0.07568f, 0.61424f, 0.07568f, 0.55f};
+        emeraldSpecular = new float[]{0.633f, 0.727811f, 0.633f, 0.55f};
+        emeraldShiny = new float[]{76.800003f};
+        emerald = new float[][]{emeraldDiffuse, emeraldAmbient, emeraldSpecular, emeraldShiny};
+
+        rubyDiffuse = new float[]{0.1745f, 0.01175f, 0.01175f, 0.55f};
+        rubyAmbient = new float[]{0.61424f, 0.04136f, 0.04136f, 0.55f};
+        rubySpecular = new float[]{0.727811f, 0.626959f, 0.626959f, 0.55f};
+        rubyShiny = new float[]{76.800003f};
+        ruby = new float[][]{rubyDiffuse, rubyAmbient, rubySpecular, rubyShiny};
+
+        turquoiseDiffuse = new float[]{0.1f, 0.18725f, 0.1745f, 0.8f};
+        turquoiseAmbient = new float[]{0.396f, 0.74151f, 0.69102f, 0.8f};
+        turquoiseSpecular = new float[]{0.297254f, 0.30829f, 0.306678f, 0.8f};
+        turquoiseShiny = new float[]{12.8f};
+        turquoise = new float[][]{turquoiseDiffuse, turquoiseAmbient, turquoiseSpecular, turquoiseShiny};
+    }
+
+    private void initializeModels() {
+        initializeLights();
+        wheel = new Wheel(glu, gl, turquoise, chrome);
         wheelList = wheel.createWheelList();
-        chairs = new Chairs(glu, gl);
+        chairs = new Chairs(glu, gl, ruby);
         chairList = chairs.createChairs();
-        frame = new Frame(glu, gl);
+        frame = new Frame(glu, gl, emerald);
         frameList = frame.createFrameList();
+    }
+
+    private void initializeLights() {
+        gl.glEnable(GLLightingFunc.GL_LIGHTING);
+        gl.glEnable(GLLightingFunc.GL_LIGHT0);
+        gl.glEnable(GLLightingFunc.GL_LIGHT1);
+
+        lightZeroEnabled = true;
+        lightOneEnabled = true;
+
+        float[] lightPos0 = { -1, 0, 0, 0 };
+        gl.glLightfv(GLLightingFunc.GL_LIGHT0, GLLightingFunc.GL_POSITION, lightPos0, 0);
+
+        float[] diffuse ={ 1, 1, 1, 1 };
+        float[] lightPos1 = { 1, 0, 0, 0 };
+        gl.glLightfv(GLLightingFunc.GL_LIGHT1, GLLightingFunc.GL_DIFFUSE, diffuse, 0);
+        gl.glLightfv(GLLightingFunc.GL_LIGHT1, GLLightingFunc.GL_POSITION, lightPos1, 0);
     }
 
     private void setDefault() {
@@ -67,40 +142,58 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
         upY = 1;
     }
 
-    private void render(GL2 gl, int width, int height) {
+    private void render(int width, int height) {
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         gl.glPushMatrix();
         gl.glCallList(frameList);
         gl.glPopMatrix();
 
-        gl.glTranslatef(0, 0, 1);
+        gl.glTranslatef(0, 0, 2);
 
         gl.glPushMatrix();
         gl.glRotated(-rotateSpeed, 0, 0, 1);
         gl.glCallList(wheelList);
-        gl.glTranslated(0, 0, 5);
+        gl.glTranslated(0, 0, 5.5);
         gl.glCallList(wheelList);
         gl.glPopMatrix();
 
-        gl.glPushMatrix();
-        gl.glTranslated(0,0, 5);
-        gl.glCallList(chairList);
-        double alpha = 60;
-        double theta = alpha * previousPosition;
-        prevX = Math.cos(theta) * 10;
-        prevZ = Math.sin(theta) * 10;
-        previousPosition++;
+        //render each chair
+        double alpha = Math.PI * 2 / NUM_CHAIRS;
 
-        gl.glTranslated(Math.cos(theta) * 10, 0, Math.sin(theta) * 10);
+        gl.glRotated(-270, 1 , 0, 0);
+        gl.glTranslated(0, 5, 0);
 
-        gl.glPopMatrix();
+        for(int i = 0; i < NUM_CHAIRS; i++) {
+            gl.glPushMatrix();
+
+            if(swingDirection) {
+                if(previousChairAngle < 2) {
+                    previousChairAngle += .075;
+                } else {
+                    swingDirection = false;
+                }
+            } else {
+                if(previousChairAngle > -2) {
+                    previousChairAngle -= .025;
+                } else {
+                    swingDirection = true;
+                }
+            }
+
+            gl.glRotated(previousChairAngle, 0, 1, 0);
+            double theta = ((alpha * i) + previousPosition) % 360;
+            gl.glTranslated(Math.cos(theta) * 10, 0, Math.sin(theta) * 10);
+            gl.glCallList(chairList);
+            gl.glPopMatrix();
+        }
+        previousPosition+= .0035;
     }
 
     private void update() {
         rotateSpeed += 0.2;
     }
 
-    private void setCamera(GL2 gl) {
+    private void setCamera() {
         gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
 
@@ -156,10 +249,13 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
                 setDefault();
                 break;
             case KeyEvent.VK_Q:
-                if(wireframeOn)
-                    wireframeOn = false;
-                else
-                    wireframeOn = true;
+                wireframeOn = (!wireframeOn);
+                break;
+            case KeyEvent.VK_1:
+                lightZeroEnabled = (!lightZeroEnabled);
+                break;
+            case KeyEvent.VK_2:
+                lightOneEnabled = (!lightOneEnabled);
                 break;
         }
         display();
@@ -173,10 +269,10 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
 
     /* GLEventListener */
     public void init(GLAutoDrawable glAutoDrawable) {
-        GL2 gl = glAutoDrawable.getGL().getGL2();
+        gl = glAutoDrawable.getGL().getGL2();
 
         gl.setSwapInterval(1);
-        initializeModels(gl);
+        initializeModels();
 
         gl.glEnable(GL.GL_DEPTH_TEST);
         gl.glDepthFunc(GL.GL_LEQUAL);
@@ -194,17 +290,19 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
         else
             gl.glPolygonMode(GL2.GL_FRONT_AND_BACK, GL2.GL_FILL);
 
-        gl.glEnable(GL2.GL_LIGHTING);
-        gl.glEnable(GL2.GL_NORMALIZE);
-        gl.glEnable(GL2.GL_COLOR_MATERIAL);
-        gl.glColorMaterial(GL2.GL_FRONT, GL2.GL_AMBIENT_AND_DIFFUSE);
+        if(lightZeroEnabled)
+            gl.glEnable(GLLightingFunc.GL_LIGHT0);
+        else
+            gl.glDisable(GLLightingFunc.GL_LIGHT0);
 
-        gl.glEnable(GL2.GL_LIGHT0);
-        gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, light0Color);
+        if(lightOneEnabled)
+            gl.glEnable(GLLightingFunc.GL_LIGHT1);
+        else
+            gl.glDisable(GLLightingFunc.GL_LIGHT1);
 
-        setCamera(gl);
+        setCamera();
         update();
-        render(gl, glAutoDrawable.getWidth(), glAutoDrawable.getHeight());
+        render(glAutoDrawable.getWidth(), glAutoDrawable.getHeight());
     }
 
     public void reshape(GLAutoDrawable glAutoDrawable, int i, int i2, int width, int height) {
