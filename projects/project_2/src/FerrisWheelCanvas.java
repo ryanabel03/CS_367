@@ -73,6 +73,7 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
         animator = new Animator(this);
         animator.add(this);
         animator.start();
+        animator.pause();
 
         setMaterialColors();
 
@@ -115,11 +116,22 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
     }
 
     private void initializeModels() {
+        float[] identity = {1,0,0,0,
+                            0,1,0,0,
+                            0,0,1,0,
+                            0,0,0,1};
+
         initializeLights();
         wheel = new Wheel(glu, gl, turquoise, chrome);
         wheelList = wheel.createWheelList();
+        wheelCF = identity;
+
         chairs = new Chairs(glu, gl, ruby);
         chairList = chairs.createChairs();
+
+        for(int i = 0; i < chairCFs.length; i++)
+            chairCFs[i] = identity;
+
         frame = new Frame(glu, gl, emerald);
         frameList = frame.createFrameList();
     }
@@ -178,7 +190,7 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
         gl.glTranslatef(0, 0, 2);
 
         gl.glPushMatrix();
-        gl.glRotated(-rotateSpeed, 0, 0, 1);
+        gl.glMultMatrixf(wheelCF, 0);
         gl.glCallList(wheelList);
         gl.glTranslated(0, 0, 5.5);
         gl.glCallList(wheelList);
@@ -188,44 +200,61 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
         gl.glRotated(-270, 1 , 0, 0);
         gl.glTranslated(0, -0.5, 0);
 
-        currentRotationAngle += 0.2;
-        currentRotationAngle = currentRotationAngle % 360;
-
         for(int i = 0; i < NUM_CHAIRS; i++) {
             gl.glPushMatrix();
-
-            //swing
-            if(swingDirection) {
-                if(previousChairAngle < 10) {
-                    previousChairAngle += .03;
-                } else {
-                    swingDirection = false;
-                }
-            } else {
-                if(previousChairAngle > -10) {
-                    previousChairAngle -= .05;
-                } else {
-                    swingDirection = true;
-                }
-            }
-
-            gl.glRotated(currentRotationAngle, 0, 1, 0);
-            double theta = ((alpha * i) + previousChairPosition) % 360;
+            //gl.glMultMatrixf(chairCFs[i], 0);
+            double theta = (alpha * i) % 360;
             gl.glTranslated(Math.cos(theta) * 10, 0, Math.sin(theta) * 10);
 
-            gl.glTranslated(0,0,0.5f);
-            gl.glRotated(previousChairAngle, 0, 1, 0);
-            gl.glTranslated(0,0,-0.5f);
             gl.glCallList(chairList);
             gl.glPopMatrix();
         }
-        previousChairPosition += .0035f;
 
         gl.glPopMatrix();
     }
 
     private void update() {
-        rotateSpeed += 0.2;
+        rotateSpeed = 0.2;
+        gl.glLoadMatrixf(wheelCF, 0);
+        gl.glMultMatrixf(MatrixHelper.getRotationMatrix(-rotateSpeed,0,0,1), 0);
+        gl.glGetFloatv(GL2.GL_MODELVIEW_MATRIX, wheelCF, 0);
+
+        currentRotationAngle += 0.00002;
+        currentRotationAngle = currentRotationAngle % 360;
+
+        //swing
+        if(swingDirection) {
+            if(previousChairAngle < 10) {
+                previousChairAngle += .03;
+            } else {
+                swingDirection = false;
+            }
+        } else {
+            if(previousChairAngle > -10) {
+                previousChairAngle -= .05;
+            } else {
+                swingDirection = true;
+            }
+        }
+
+        int count = 0;
+        for(int i = 0; i < chairCFs.length; i++) {
+            gl.glLoadMatrixf(chairCFs[i], 0);
+
+            double alpha = Math.PI * 2 / NUM_CHAIRS;
+            double theta = ((alpha * count) + previousChairPosition) % 360;
+            //gl.glMultMatrixf(MatrixHelper.getTranslationMatrix((float)Math.cos(theta)*10, 0, (float)Math.sin(theta)*10), 0);
+            //gl.glLoadMatrixf(chair, 0);
+           // gl.glMultMatrixf(MatrixHelper.getRotationMatrix(currentRotationAngle, 1, 0, 1), 0);
+            //gl.glMultMatrixf(MatrixHelper.getTranslationMatrix(0,0,0.5f), 0);
+            //gl.glMultMatrixf(MatrixHelper.getRotationMatrix(previousChairAngle, 0, 0, 1), 0);
+            //gl.glMultMatrixf(MatrixHelper.getTranslationMatrix(0,0,-0.5f), 0);
+
+            gl.glGetFloatv(GL2.GL_MODELVIEW_MATRIX, chairCFs[i], 0);
+            count++;
+        }
+
+        previousChairPosition += .0035f;
     }
 
     private void setCamera() {
