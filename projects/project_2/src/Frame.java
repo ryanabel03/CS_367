@@ -26,13 +26,13 @@ public class Frame {
         gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, frameColor[2], 0);
         gl.glMaterialf(GL2.GL_FRONT_AND_BACK, GL2.GL_SHININESS, frameColor[3][0]);
 
-        glu.gluCylinder(quadric, 0.5, 0.5, 10, 10, 5);
+        glu.gluCylinder(quadric, 0.5, 0.5, 10, 10, 1);
 
         gl.glRotated(90, 1, 0, 0);
         gl.glTranslated(0, -0.5, -0.5);
-        glu.gluCylinder(quadric, 0.5, 0.5, 15, 10, 5);
+        glu.gluCylinder(quadric, 0.5, 0.5, 15, 10, 1);
         gl.glTranslated(0, 10.5, 0);
-        glu.gluCylinder(quadric, 0.5, 0.5, 15, 10, 5);
+        glu.gluCylinder(quadric, 0.5, 0.5, 15, 10, 1);
         gl.glTranslated(0, -5.25, 15);
         glu.gluDisk(quadric, 10, 0, 50, 10);
 

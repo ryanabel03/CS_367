@@ -19,6 +19,7 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
     private boolean wireframeOn;
     private GLU glu;
     private GL2 gl;
+    private Animator animator;
 
     private float eyeZ, eyeX, eyeY, refZ, refX, refY, upZ, upX, upY;
 
@@ -65,7 +66,7 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
         this.addMouseMotionListener(this);
         this.addMouseWheelListener(this);
 
-        Animator animator = new Animator(this);
+        animator = new Animator(this);
         animator.add(this);
         animator.start();
 
@@ -128,19 +129,20 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
         float[] diffuse ={ 1, 1, 1, 1 };
         float[] lightPos1 = { 1, 0, 0, 0 };
         gl.glLightfv(GLLightingFunc.GL_LIGHT1, GLLightingFunc.GL_DIFFUSE, diffuse, 0);
+        gl.glLightfv(GLLightingFunc.GL_LIGHT1, GLLightingFunc.GL_SPECULAR, diffuse, 0);
         gl.glLightfv(GLLightingFunc.GL_LIGHT1, GLLightingFunc.GL_POSITION, lightPos1, 0);
     }
 
     private void setDefault() {
-        eyeZ = 20;
-        eyeX = 5;
-        eyeY = 0;
-        refZ = 0;
-        refX = 0;
-        refY = 0;
-        upZ = 0;
+        eyeX = 15;
+        eyeY = -7.5f;
+        eyeZ = 28;
+        refX = 1.65f;
+        refY = -1.8f;
+        refZ = 0.5f;
         upX = 0;
         upY = 1;
+        upZ = 0;
     }
 
     private void render(int width, int height) {
@@ -263,7 +265,23 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
             case KeyEvent.VK_2:
                 lightOneEnabled = (!lightOneEnabled);
                 break;
+            case KeyEvent.VK_SPACE:
+                rotateSpeed += 0.2 * 12;
+                currentRotationAngle += 0.2 * 12;
+                previousChairPosition += 0.0035 * 12;
+                break;
+            case KeyEvent.VK_BACK_SPACE:
+                rotateSpeed -= 0.2 * 14;
+                currentRotationAngle -= 0.2 * 14;
+                previousChairPosition -= 0.0035 * 14;
+                break;
+            case KeyEvent.VK_P:
+                if(animator.isPaused())
+                    animator.resume();
+                else
+                    animator.pause();
         }
+
         display();
     }
 
@@ -322,6 +340,9 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
     }
 
     public void mouseMoved(MouseEvent e) {
+        if(animator.isPaused())
+            return;
+
         Point p = e.getPoint();
         refX = (float) p.getX() * MOUSE_SPEED;
         refY = -(float) p.getY() * MOUSE_SPEED;

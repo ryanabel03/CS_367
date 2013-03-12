@@ -41,7 +41,7 @@ public class Wheel {
             double angle = i * 360.0 / NUM_SPOKES;
             gl.glPushMatrix();
             gl.glRotated(angle, 0, 1, 0);
-            glu.gluCylinder(quadric, 0.2, 0.2, 9.92, 10, 5);
+            glu.gluCylinder(quadric, 0.2, 0.2, 9.92, 10, 1);
             gl.glPopMatrix();
         }
 
