@@ -3,16 +3,12 @@ import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUquadric;
 
 public class Wheel {
-    float radius;
-    float tire_thickness;
     GLU glu;
     GLUquadric quadric;
     GL2 gl;
 
-    public Wheel(float radius, float tire_thickness, GLU glu, GL2 gl) {
+    public Wheel(GLU glu, GL2 gl) {
         this.glu = glu;
-        this.radius = radius;
-        this.tire_thickness = tire_thickness;
         quadric = glu.gluNewQuadric();
         this.gl = gl;
     }

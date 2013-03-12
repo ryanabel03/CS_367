@@ -15,6 +15,7 @@
     <orderEntry type="library" name="jogl-java-src" level="project" />
     <orderEntry type="library" name="joal-natives-macosx-universal" level="project" />
     <orderEntry type="library" name="jogl-all" level="project" />
+    <orderEntry type="library" name="jar" level="project" />
   </component>
 </module>
 

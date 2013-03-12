@@ -19,12 +19,13 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
     boolean wireframeOn;
     GLU glu;
     float eyeZ, eyeX, eyeY, refZ, refX, refY, upZ, upX, upY;
-    int wheelList;
-    Wheel wheel;
     private Chairs chairs;
-    private int chairList;
+    private Wheel wheel;
+    private Frame frame;
+    private int chairList, wheelList, frameList;
     FloatBuffer light0Color;
     private double previousPosition = 0;
+    private double prevX, prevZ;
 
     public FerrisWheelCanvas(GLCapabilities capabilities) {
         super(capabilities);
@@ -46,11 +47,12 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
     }
 
     private void initializeModels(GL2 gl) {
-        wheel = new Wheel(10, 1, glu, gl);
+        wheel = new Wheel(glu, gl);
         wheelList = wheel.createWheelList();
         chairs = new Chairs(glu, gl);
         chairList = chairs.createChairs();
-
+        frame = new Frame(glu, gl);
+        frameList = frame.createFrameList();
     }
 
     private void setDefault() {
@@ -68,21 +70,30 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
     private void render(GL2 gl, int width, int height) {
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         gl.glPushMatrix();
+        gl.glCallList(frameList);
+        gl.glPopMatrix();
+
+        gl.glTranslatef(0, 0, 1);
+
+        gl.glPushMatrix();
         gl.glRotated(-rotateSpeed, 0, 0, 1);
         gl.glCallList(wheelList);
         gl.glTranslated(0, 0, 5);
         gl.glCallList(wheelList);
+        gl.glPopMatrix();
 
-        double alpha = Math.PI * 2 / 6;
-
+        gl.glPushMatrix();
+        gl.glTranslated(0,0, 5);
+        gl.glCallList(chairList);
+        double alpha = 60;
         double theta = alpha * previousPosition;
-
+        prevX = Math.cos(theta) * 10;
+        prevZ = Math.sin(theta) * 10;
         previousPosition++;
 
         gl.glTranslated(Math.cos(theta) * 10, 0, Math.sin(theta) * 10);
-        gl.glCallList(chairList);
-        gl.glPopMatrix();
 
+        gl.glPopMatrix();
     }
 
     private void update() {
