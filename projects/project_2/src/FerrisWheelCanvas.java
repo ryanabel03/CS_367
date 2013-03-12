@@ -37,6 +37,9 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
     private boolean lightOneEnabled = false;
     private float[] lightZeroPos;
 
+    private float[][] chairCFs;
+    private float[] wheelCF, frameCF, cameraCF;
+
     //chrome
     private float[] chromeDiffuse, chromeAmbient, chromeSpecular, chromeShiny;
     private float[][] chrome;
@@ -72,6 +75,11 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
         animator.start();
 
         setMaterialColors();
+
+        cameraCF = new float[16];
+        wheelCF = new float[16];
+        frameCF = new float[16];
+        chairCFs = new float[6][16];
     }
 
     private void setMaterialColors() {
@@ -154,6 +162,8 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
     private void render(int width, int height) {
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 
+        gl.glLoadMatrixf(cameraCF, 0);
+
         gl.glPushMatrix();
         gl.glDisable(GLLightingFunc.GL_LIGHTING);
         gl.glTranslatef(lightZeroPos[0], lightZeroPos[1], lightZeroPos[2]);
@@ -228,6 +238,7 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
         gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadIdentity();
         glu.gluLookAt(eyeX, eyeY, eyeZ, refX, refY, refZ, upX, upY, upZ);
+        gl.glGetFloatv(GL2.GL_MODELVIEW_MATRIX, cameraCF, 0);
     }
 
     /* KeyListener */
@@ -237,6 +248,7 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
             case KeyEvent.VK_UP:
                 eyeY += KEY_SPEED;
                 refY += KEY_SPEED;
+                //cameraCF *=
                 break;
             case KeyEvent.VK_DOWN:
                 eyeY -= KEY_SPEED;
