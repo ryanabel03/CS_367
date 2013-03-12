@@ -16,6 +16,7 @@
     <orderEntry type="library" name="joal-natives-macosx-universal" level="project" />
     <orderEntry type="library" name="jogl-all" level="project" />
     <orderEntry type="library" name="jar" level="project" />
+    <orderEntry type="library" name="ejml-0.21" level="project" />
   </component>
 </module>
 
