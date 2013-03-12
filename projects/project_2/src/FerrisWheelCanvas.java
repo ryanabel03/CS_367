@@ -27,8 +27,9 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
     private Frame frame;
     private int chairList, wheelList, frameList;
 
-    private double previousPosition = 0;
+    private double currentRotationAngle = 0;
     private double previousChairAngle = 0;
+    private double previousChairPosition = 0;
     private boolean swingDirection = true;
 
     private boolean lightZeroEnabled = false;
@@ -155,38 +156,43 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
         gl.glCallList(wheelList);
         gl.glTranslated(0, 0, 5.5);
         gl.glCallList(wheelList);
-        gl.glPopMatrix();
 
         //render each chair
         double alpha = Math.PI * 2 / NUM_CHAIRS;
 
         gl.glRotated(-270, 1 , 0, 0);
-        gl.glTranslated(0, 5, 0);
+        //gl.glTranslated(0, 5, 0);
+        gl.glTranslated(0, -0.5, 0);
+
+        currentRotationAngle += 0.2;
+        currentRotationAngle = currentRotationAngle % 360;
 
         for(int i = 0; i < NUM_CHAIRS; i++) {
             gl.glPushMatrix();
 
             if(swingDirection) {
-                if(previousChairAngle < 2) {
-                    previousChairAngle += .075;
+                if(previousChairAngle < 5) {
+                    previousChairAngle += .022;
                 } else {
                     swingDirection = false;
                 }
             } else {
-                if(previousChairAngle > -2) {
-                    previousChairAngle -= .025;
+                if(previousChairAngle > -5) {
+                    previousChairAngle -= .01;
                 } else {
                     swingDirection = true;
                 }
             }
 
-            gl.glRotated(previousChairAngle, 0, 1, 0);
-            double theta = ((alpha * i) + previousPosition) % 360;
+            gl.glRotated(previousChairAngle + currentRotationAngle, 0, 1, 0);
+            double theta = ((alpha * i) + previousChairPosition) % 360;
             gl.glTranslated(Math.cos(theta) * 10, 0, Math.sin(theta) * 10);
             gl.glCallList(chairList);
             gl.glPopMatrix();
         }
-        previousPosition+= .0035;
+        previousChairPosition += .0035f;
+
+        gl.glPopMatrix();
     }
 
     private void update() {

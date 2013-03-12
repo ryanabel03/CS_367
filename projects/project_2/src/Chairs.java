@@ -25,10 +25,10 @@ public class Chairs {
         gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, chairColor[2], 0);
         gl.glMaterialf(GL2.GL_FRONT_AND_BACK, GL2.GL_SHININESS, chairColor[3][0]);
 
-        glu.gluCylinder(quadric, 2.5, 1, 3, 50, 5);
+        glu.gluCylinder(quadric, 2.5, 1.8, 3, 50, 5);
         glu.gluDisk(quadric, 2.5, 2, 20, 1);
         gl.glTranslated(0, 0, 3);
-        glu.gluDisk(quadric, 1, 0, 20, 1);
+        glu.gluDisk(quadric, 1.8, 0, 20, 1);
 
         gl.glEndList();
         return listId;
