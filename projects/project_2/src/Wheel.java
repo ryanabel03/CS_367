@@ -28,7 +28,7 @@ public class Wheel {
         gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, wheelColor[2], 0);
         gl.glMaterialf(GL2.GL_FRONT_AND_BACK, GL2.GL_SHININESS, wheelColor[3][0]);
 
-        glu.gluCylinder(quadric, 10, 10, 0.5, 50, 5);
+        glu.gluCylinder(quadric, 10, 10, 0.5, 70, 1);
         gl.glRotated(-270, 1, 0, 0);
         gl.glTranslated(0, 0.25, 0);
 
