@@ -28,10 +28,7 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
     private Frame frame;
     private int chairList, wheelList, frameList;
 
-    private double currentRotationAngle = 0;
-    private double previousChairAngle = 0;
-    private double previousChairPosition = 0;
-    private boolean swingDirection = true;
+    private double swingSpeed;
 
     private boolean lightZeroEnabled = false;
     private boolean lightOneEnabled = false;
@@ -40,22 +37,20 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
     private float[][] chairCFs;
     private float[] wheelCF, frameCF, cameraCF;
 
+    boolean test = false;
+
     //chrome
     private float[] chromeDiffuse, chromeAmbient, chromeSpecular, chromeShiny;
     private float[][] chrome;
-
     //polished gold
     private float[] pGoldDiffuse, pGoldAmbient, pGoldSpecular, pGoldShiny;
     private float[][] pGold;
-
     //emerald
     private float[] emeraldDiffuse, emeraldAmbient, emeraldSpecular, emeraldShiny;
     private float[][] emerald;
-
     //ruby
     private float[] rubyDiffuse, rubyAmbient, rubySpecular, rubyShiny;
     private float[][] ruby;
-
     //turquoise
     private float[] turquoiseDiffuse, turquoiseAmbient, turquoiseSpecular, turquoiseShiny;
     private float[][] turquoise;
@@ -81,6 +76,8 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
         wheelCF = new float[16];
         frameCF = new float[16];
         chairCFs = new float[6][16];
+
+        swingSpeed = 0.2;
     }
 
     private void setMaterialColors() {
@@ -124,16 +121,17 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
         initializeLights();
         wheel = new Wheel(glu, gl, turquoise, chrome);
         wheelList = wheel.createWheelList();
-        wheelCF = identity;
+        wheelCF = identity.clone();
 
         chairs = new Chairs(glu, gl, ruby);
         chairList = chairs.createChairs();
 
         for(int i = 0; i < chairCFs.length; i++)
-            chairCFs[i] = identity;
+            chairCFs[i] = identity.clone();
 
         frame = new Frame(glu, gl, emerald);
         frameList = frame.createFrameList();
+        frameCF = identity;
     }
 
     private void initializeLights() {
@@ -171,7 +169,7 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
         upZ = 0;
     }
 
-    private void render(int width, int height) {
+    private void render() {
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 
         gl.glLoadMatrixf(cameraCF, 0);
@@ -184,12 +182,12 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
         gl.glPopMatrix();
 
         gl.glPushMatrix();
+        gl.glMultMatrixf(frameCF, 0);
         gl.glCallList(frameList);
         gl.glPopMatrix();
 
-        gl.glTranslatef(0, 0, 2);
-
         gl.glPushMatrix();
+        gl.glTranslatef(0, 0, 2);
         gl.glMultMatrixf(wheelCF, 0);
         gl.glCallList(wheelList);
         gl.glTranslated(0, 0, 5.5);
@@ -198,14 +196,14 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
         //render each chair
         double alpha = Math.PI * 2 / NUM_CHAIRS;
         gl.glRotated(-270, 1 , 0, 0);
-        gl.glTranslated(0, -0.5, 0);
+        gl.glTranslated(0, -0.5f, 0);
 
         for(int i = 0; i < NUM_CHAIRS; i++) {
             gl.glPushMatrix();
-            //gl.glMultMatrixf(chairCFs[i], 0);
+            gl.glMultMatrixf(chairCFs[i], 0);
+
             double theta = (alpha * i) % 360;
             gl.glTranslated(Math.cos(theta) * 10, 0, Math.sin(theta) * 10);
-
             gl.glCallList(chairList);
             gl.glPopMatrix();
         }
@@ -219,42 +217,16 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
         gl.glMultMatrixf(MatrixHelper.getRotationMatrix(-rotateSpeed,0,0,1), 0);
         gl.glGetFloatv(GL2.GL_MODELVIEW_MATRIX, wheelCF, 0);
 
-        currentRotationAngle += 0.00002;
-        currentRotationAngle = currentRotationAngle % 360;
+        swingSpeed = swingSpeed % 90;
 
-        //swing
-        if(swingDirection) {
-            if(previousChairAngle < 10) {
-                previousChairAngle += .03;
-            } else {
-                swingDirection = false;
-            }
-        } else {
-            if(previousChairAngle > -10) {
-                previousChairAngle -= .05;
-            } else {
-                swingDirection = true;
-            }
-        }
-
-        int count = 0;
         for(int i = 0; i < chairCFs.length; i++) {
             gl.glLoadMatrixf(chairCFs[i], 0);
 
-            double alpha = Math.PI * 2 / NUM_CHAIRS;
-            double theta = ((alpha * count) + previousChairPosition) % 360;
-            //gl.glMultMatrixf(MatrixHelper.getTranslationMatrix((float)Math.cos(theta)*10, 0, (float)Math.sin(theta)*10), 0);
-            //gl.glLoadMatrixf(chair, 0);
-           // gl.glMultMatrixf(MatrixHelper.getRotationMatrix(currentRotationAngle, 1, 0, 1), 0);
-            //gl.glMultMatrixf(MatrixHelper.getTranslationMatrix(0,0,0.5f), 0);
-            //gl.glMultMatrixf(MatrixHelper.getRotationMatrix(previousChairAngle, 0, 0, 1), 0);
-            //gl.glMultMatrixf(MatrixHelper.getTranslationMatrix(0,0,-0.5f), 0);
+            gl.glMultMatrixf(MatrixHelper.getRotationMatrix(rotateSpeed, 0, 1, 0), 0);
 
             gl.glGetFloatv(GL2.GL_MODELVIEW_MATRIX, chairCFs[i], 0);
-            count++;
         }
-
-        previousChairPosition += .0035f;
+        render();
     }
 
     private void setCamera() {
@@ -325,13 +297,9 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
                 break;
             case KeyEvent.VK_SPACE:
                 rotateSpeed += 0.2 * 12;
-                currentRotationAngle += 0.2 * 12;
-                previousChairPosition += 0.0035 * 12;
                 break;
             case KeyEvent.VK_BACK_SPACE:
                 rotateSpeed -= 0.2 * 14;
-                currentRotationAngle -= 0.2 * 14;
-                previousChairPosition -= 0.0035 * 14;
                 break;
             case KeyEvent.VK_P:
                 if(animator.isPaused())
@@ -404,7 +372,6 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
 
         setCamera();
         update();
-        render(glAutoDrawable.getWidth(), glAutoDrawable.getHeight());
     }
 
     public void reshape(GLAutoDrawable glAutoDrawable, int i, int i2, int width, int height) {
