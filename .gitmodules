@@ -1,3 +1,6 @@
 [submodule "MathGL"]
 	path = MathGL
-	url = git://github.com/Groovounet/glm.git
+	url = git://github.com/g-truc/glm.git
+[submodule "GLES"]
+	path = GLES
+	url = http://www.cis.gvsu.edu/~dulimarh/CS367/gitrepos/DroidGLES.git
