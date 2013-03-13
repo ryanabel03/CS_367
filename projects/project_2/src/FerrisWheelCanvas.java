@@ -29,6 +29,7 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
     private int chairList, wheelList, frameList;
 
     private double swingSpeed;
+    private boolean swingRight;
 
     private boolean lightZeroEnabled = false;
     private boolean lightOneEnabled = false;
@@ -77,7 +78,7 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
         frameCF = new float[16];
         chairCFs = new float[6][16];
 
-        swingSpeed = 0.2;
+        swingSpeed = 0.04f;
     }
 
     private void setMaterialColors() {
@@ -142,18 +143,15 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
         lightZeroEnabled = true;
         lightOneEnabled = true;
 
-        float[] light0Color = {0.5f, 0.5f, 0.5f, 1f};
-        float[] light1Color = {0.1f, 0.1f, 0.1f, 1f};
-        lightZeroPos = new float[]{ -1, 0, 0, 0 };
+        float[] light0Color = {0.4f, 0.4f, 0.4f, 1f};
+        float[] light1Color = {0.4f, 0.4f, 0.4f, 1f};
+        lightZeroPos = new float[]{ 2, 0, 20, 0 };
         gl.glLightfv(GLLightingFunc.GL_LIGHT0, GLLightingFunc.GL_POSITION, lightZeroPos, 0);
-        gl.glLightfv(GLLightingFunc.GL_LIGHT0, GLLightingFunc.GL_DIFFUSE, light0Color, 0);
-        gl.glLightfv(GLLightingFunc.GL_LIGHT0, GLLightingFunc.GL_AMBIENT, light0Color, 0);
         gl.glLightfv(GLLightingFunc.GL_LIGHT0, GLLightingFunc.GL_SPECULAR, light0Color, 0);
 
-        float[] lightPos1 = { 1, 0, 0, 0 };
+        float[] lightPos1 = { -1, 0, 0, 0 };
         gl.glLightfv(GLLightingFunc.GL_LIGHT1, GLLightingFunc.GL_POSITION, lightPos1, 0);
         gl.glLightfv(GLLightingFunc.GL_LIGHT1, GLLightingFunc.GL_DIFFUSE, light1Color, 0);
-        gl.glLightfv(GLLightingFunc.GL_LIGHT1, GLLightingFunc.GL_AMBIENT, light1Color, 0);
         gl.glLightfv(GLLightingFunc.GL_LIGHT1, GLLightingFunc.GL_SPECULAR, light1Color, 0);
     }
 
@@ -174,12 +172,14 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
 
         gl.glLoadMatrixf(cameraCF, 0);
 
-        gl.glPushMatrix();
-        gl.glDisable(GLLightingFunc.GL_LIGHTING);
-        gl.glTranslatef(lightZeroPos[0], lightZeroPos[1], lightZeroPos[2]);
-        glu.gluSphere(glu.gluNewQuadric(), 1, 20, 10);
-        gl.glEnable(GLLightingFunc.GL_LIGHTING);
-        gl.glPopMatrix();
+        if(lightZeroEnabled) {
+            gl.glPushMatrix();
+            gl.glDisable(GLLightingFunc.GL_LIGHTING);
+            gl.glTranslatef(lightZeroPos[0], lightZeroPos[1], lightZeroPos[2]);
+            glu.gluSphere(glu.gluNewQuadric(), 1, 20, 10);
+            gl.glEnable(GLLightingFunc.GL_LIGHTING);
+            gl.glPopMatrix();
+        }
 
         gl.glPushMatrix();
         gl.glMultMatrixf(frameCF, 0);
@@ -195,15 +195,15 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
 
         //render each chair
         double alpha = Math.PI * 2 / NUM_CHAIRS;
-        gl.glRotated(-270, 1 , 0, 0);
-        gl.glTranslated(0, -0.5f, 0);
+        gl.glTranslated(-Math.cos(alpha % 360)*10, -Math.sin(alpha % 360)*10, -0.5);
 
         for(int i = 0; i < NUM_CHAIRS; i++) {
+            double theta = (alpha * i) % 360;
+            gl.glTranslated(Math.cos(theta) * 10, Math.sin(theta) * 10, 0);
+
             gl.glPushMatrix();
             gl.glMultMatrixf(chairCFs[i], 0);
-
-            double theta = (alpha * i) % 360;
-            gl.glTranslated(Math.cos(theta) * 10, 0, Math.sin(theta) * 10);
+            gl.glRotated(90, 1 , 0, 0);
             gl.glCallList(chairList);
             gl.glPopMatrix();
         }
@@ -217,13 +217,24 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
         gl.glMultMatrixf(MatrixHelper.getRotationMatrix(-rotateSpeed,0,0,1), 0);
         gl.glGetFloatv(GL2.GL_MODELVIEW_MATRIX, wheelCF, 0);
 
-        swingSpeed = swingSpeed % 90;
+        /*if(swingRight) {
+            if(swingSpeed < -2) {
+                swingSpeed += .4f;
+            } else{
+                swingRight = false;
+            }
+        }
+        else{
+            if(swingSpeed > 2) {
+                swingSpeed -= .4f;
+            } else{
+                swingRight = true;
+            }
+        }*/
 
         for(int i = 0; i < chairCFs.length; i++) {
             gl.glLoadMatrixf(chairCFs[i], 0);
-
-            gl.glMultMatrixf(MatrixHelper.getRotationMatrix(rotateSpeed, 0, 1, 0), 0);
-
+            gl.glMultMatrixf(MatrixHelper.getRotationMatrix(rotateSpeed,0,0,1), 0);
             gl.glGetFloatv(GL2.GL_MODELVIEW_MATRIX, chairCFs[i], 0);
         }
         render();
@@ -249,7 +260,6 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
             case KeyEvent.VK_UP:
                 eyeY += KEY_SPEED;
                 refY += KEY_SPEED;
-                //cameraCF *=
                 break;
             case KeyEvent.VK_DOWN:
                 eyeY -= KEY_SPEED;
@@ -347,7 +357,6 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
     }
 
     public void dispose(GLAutoDrawable glAutoDrawable) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public void display(GLAutoDrawable glAutoDrawable) {
