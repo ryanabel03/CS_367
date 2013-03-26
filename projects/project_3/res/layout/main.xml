@@ -11,6 +11,8 @@
         android:layout_alignParentLeft="true" android:layout_alignBottom="@+id/ButtonArea"
         android:layout_toLeftOf="@+id/ButtonArea" android:layout_alignTop="@+id/ButtonArea">
     </TextView>
+
+
     <RelativeLayout android:layout_width="140dip"
                     android:layout_height="match_parent"
                     android:layout_alignParentRight="true"
@@ -29,6 +31,14 @@
                 android:id="@+id/NoPress"
                 android:layout_alignLeft="@+id/Press"
                 android:layout_below="@+id/Press"
+                />
+
+        <TextView
+                android:id="@+id/dummy"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
                 />
     </RelativeLayout>
 </RelativeLayout>

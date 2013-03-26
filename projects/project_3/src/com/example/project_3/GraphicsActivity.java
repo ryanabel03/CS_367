@@ -4,14 +4,18 @@ import android.app.Activity;
 import android.content.Context;
 import android.hardware.SensorManager;
 import android.opengl.GLSurfaceView;
+import android.opengl.GLU;
 import android.os.Bundle;
 import android.view.*;
+
+import javax.microedition.khronos.opengles.GL10;
 
 public class GraphicsActivity extends Activity {
     private GLView mView;
     private GLRenderer render;
     private SensorManager sm;
     private Display myDisplay;
+    private TransformationParams par;
 
     /**
      * Called when the activity is first created.
@@ -19,6 +23,16 @@ public class GraphicsActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        par = new TransformationParams();
+        par.eyeX = 3f;
+        par.eyeY = -4f;
+        par.eyeZ = 3f;
+        par.litePos[0] = 0f;
+        par.litePos[1] = 0f;
+        par.litePos[2] = 3f;
+        par.droid_x = 2.0f;
+        par.droid_y = 1.0f;
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
@@ -34,7 +48,7 @@ public class GraphicsActivity extends Activity {
         setContentView(R.layout.main);
 
         /* replace Textview with GLView */
-        View dummy = findViewById(R.id.GraphicsView);
+        View dummy = findViewById(R.id.dummy);
         ViewGroup top = (ViewGroup) dummy.getParent();
 
         mView.setLayoutParams(dummy.getLayoutParams());
@@ -59,7 +73,7 @@ public class GraphicsActivity extends Activity {
     public class GLView extends GLSurfaceView {
         public GLView(Context context) {
             super(context);
-            render = new GLRenderer(context);
+            render = new GLRenderer(context, par);
 
             setRenderer(render);
             setRenderMode(RENDERMODE_CONTINUOUSLY);
