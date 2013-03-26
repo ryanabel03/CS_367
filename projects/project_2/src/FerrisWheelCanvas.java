@@ -198,7 +198,7 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
 
         //render each chair
         double alpha = Math.PI * 2 / NUM_CHAIRS;
-        gl.glTranslated(-Math.cos(alpha % 360)*10, -Math.sin(alpha % 360)*10, -0.5);
+        gl.glTranslated(-Math.cos(alpha % 360) * 10, -Math.sin(alpha % 360) * 10, -0.5);
 
         for(int i = 0; i < NUM_CHAIRS; i++) {
             double theta = (alpha * i) % 360;
@@ -239,6 +239,7 @@ public class FerrisWheelCanvas extends GLCanvas implements GLEventListener, KeyL
             gl.glMultMatrixf(MatrixHelper.getRotationMatrix(rotateSpeed + (swingSpeed*swingRight),0,0,1), 0);
             gl.glGetFloatv(GL2.GL_MODELVIEW_MATRIX, chairCFs[i], 0);
         }
+
         render();
     }
 
