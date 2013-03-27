@@ -1,2 +1,14 @@
+<<<<<<< HEAD
 .DS_Store
 *.class
+=======
+build
+*~
+*.o
+.DS_Store
+CMakeCache.txt
+CMakeFiles
+Debug
+cmake_install.cmake
+
+>>>>>>> 45061411981aefd9608074ce251830dfde0861e8

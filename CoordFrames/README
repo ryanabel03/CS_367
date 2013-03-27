@@ -1,0 +1,25 @@
+This example shows how to maintain a separate coordinate frame (4x4 matrix)
+for each 3D object. Using this CF, all transformations to an object can
+be implemented by multiplying the CF with a new transformation.
+
+* Post-multiplying an operation M with CF
+
+      CF * M
+
+  transforms the CF with respect to its own CF
+
+* Pre-multiplying an operation M with CF
+
+     M * CF
+
+  transforms the CF with respect to the global coordinate frame
+
+Compilation Instructions
+========================
+The matrix, vector, and quaternion operations in this example are
+implemented using the OpenGL Mathematics library found at
+http://glm.g-truc.net. 
+
+The API page of the GLM library is at http://glm.g-truc.net/api-0.9.4
+The source code of this library can be cloned from
+https://github.com/g-truc/glm.

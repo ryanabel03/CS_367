@@ -1,0 +1,33 @@
+OVERVIEW
+This example shows an animation of a wheel at the tip of two arms.
+The wheel rotates on its own axis while the arms themselves swing like a 
+pendulum.
+
+By maintaining separate coordinate frames for each object (one for the arms
+and for the wheel), a composite transformation can be easily calculated.
+
+You will find several files under the src directory:
+
+animation.cc   : the main driver of the entire program
+Model.h        : the abstract base class of the other geometric objects
+Cylinder{h.cc} : take a look at the newInstance() function and learn how to 
+                 assign normal vector to the vertices. The shape created by
+                 this class is a actually a conical cylinder (top and
+                 bottom disks may be of different radii).  The axis of the
+                 cylinder is the Z-axis so the normal vector of to top disk
+                 is (0, 0, 1) and the normal vector of the bottom disk is
+                 (0, 0, -1). For a regular cylinder where the top and
+                 bottom disks have the same radius, the normal vectors
+                 around the curved body are parallel to the XY-plane.  But
+                 for a conical cylinder, these normal vectors will point
+                 towards the plane of the smaller disk.  The normal vectors
+                 around the body are calculated from the cross product of
+                 two vectors (v1, v2, v4) in the code.
+Wheel.{h,cc}   : The "rubber" tire of the wheel is a glutSolidTorus.
+                 The center hub and the 5 spokes around it are made from
+                 the Cylinder class above.
+Arm.{h,cc}     : Instead of using the cylinder from the above class, two
+                 swing arms created in this class are made from a single
+                 copy of gluCylinder (Quadrics)
+
+
